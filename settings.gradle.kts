@@ -23,3 +23,4 @@ rootProject.name = "GalleryOn"
 include(":app")
 include(":core")
 include(":data")
+include(":domain")
