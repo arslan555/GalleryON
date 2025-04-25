@@ -33,11 +33,14 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.material)
+    implementation(libs.coroutines.android)
+
+    // Optional common UI tools
+    implementation(libs.lifecycle.runtime)
+    implementation(libs.datastore.preferences)
+
+    // Unit Testing
     testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-}
+    testImplementation(libs.mockk)
+    }

@@ -33,11 +33,11 @@ android {
 }
 
 dependencies {
+    // Kotlin + Coroutines
+    implementation(libs.coroutines.android) // can use `.core` if pure JVM needed
 
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.material)
+    // Unit Testing
     testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
+    testImplementation(libs.coroutines.test)
+    testImplementation(libs.mockk)
 }
