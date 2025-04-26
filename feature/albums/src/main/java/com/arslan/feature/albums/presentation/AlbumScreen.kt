@@ -1,10 +1,6 @@
 package com.arslan.feature.albums.presentation
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -13,39 +9,27 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.ViewModule
-import androidx.compose.material.icons.outlined.List
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.arslan.core.permissions.RequestPermissions
 import com.arslan.domain.model.album.AlbumItem
 import com.arslan.feature.albums.presentation.components.AlbumGridItem
 import com.arslan.feature.albums.presentation.components.AlbumListItem
 
 @OptIn(ExperimentalMaterial3Api::class)
-
 @Composable
 fun AlbumsScreen(
     viewModel: AlbumsViewModel = hiltViewModel(),
     onAlbumClick: (AlbumItem) -> Unit
 ) {
+    var isGrid by rememberSaveable { mutableStateOf(true) }
+    var hasPermission by remember { mutableStateOf(false) }
     val state by viewModel.state.collectAsState()
-
-    var isGrid by remember { mutableStateOf(true) }
 
     Scaffold(
         topBar = {
@@ -63,65 +47,73 @@ fun AlbumsScreen(
         }
     ) { innerPadding ->
 
-        when (val currentState = state) {
-            is AlbumsState.Loading -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+            RequestPermissions { granted ->
+                hasPermission = granted
+                if (granted) {
+                    viewModel.onEvent(AlbumsEvent.Refresh)
                 }
             }
 
-            is AlbumsState.Error -> {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(text = currentState.message)
-                }
-            }
+            if (!hasPermission) {
+                Text(
+                    text = "Storage permissions are required to access albums.",
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            } else {
+                when (val currentState = state) {
+                    is AlbumsState.Loading -> {
+                        CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                    }
 
-            is AlbumsState.Success -> {
-                val albums = currentState.albums
+                    is AlbumsState.Error -> {
+                        Text(
+                            text = currentState.message,
+                            modifier = Modifier.align(Alignment.Center)
+                        )
+                    }
 
-                if (isGrid) {
-                    LazyVerticalGrid(
-                        columns = GridCells.Fixed(2),
-                        contentPadding = PaddingValues(8.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier.padding(innerPadding)
-                    ) {
-                        items(albums) { album ->
-                            AlbumGridItem(album = album, onClick = {
-                                viewModel.onEvent(AlbumsEvent.AlbumClicked(album.id))
-                                onAlbumClick(album)
-                            })
+                    is AlbumsState.Success -> {
+                        val albums = currentState.albums
+                        if (isGrid) {
+                            LazyVerticalGrid(
+                                columns = GridCells.Fixed(2),
+                                contentPadding = PaddingValues(8.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                modifier = Modifier.fillMaxSize()
+                            ) {
+                                items(albums) { album ->
+                                    AlbumGridItem(album = album, onClick = {
+                                        viewModel.onEvent(AlbumsEvent.AlbumClicked(album.id))
+                                        onAlbumClick(album)
+                                    })
+                                }
+                            }
+                        } else {
+                            LazyColumn(
+                                contentPadding = PaddingValues(8.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp),
+                                modifier = Modifier.fillMaxSize()
+                            ) {
+                                items(albums) { album ->
+                                    AlbumListItem(album = album, onClick = {
+                                        viewModel.onEvent(AlbumsEvent.AlbumClicked(album.id))
+                                        onAlbumClick(album)
+                                    })
+                                }
+                            }
                         }
                     }
-                } else {
-                    LazyColumn(
-                        contentPadding = PaddingValues(8.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier.padding(innerPadding)
-                    ) {
-                        items(albums) { album ->
-                            AlbumListItem(album = album, onClick = {
-                                viewModel.onEvent(AlbumsEvent.AlbumClicked(album.id))
-                                onAlbumClick(album)
-                            })
-                        }
+
+                    is AlbumsState.AlbumSelected -> {
+                        // Optionally handle selected album
                     }
                 }
-            }
-
-            is AlbumsState.AlbumSelected -> {
-                // Optionally handle selected album
             }
         }
     }

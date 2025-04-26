@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 class GetAllMediaUseCase(
     private val mediaRepository: MediaRepository
 ) {
-    fun execute(): Flow<List<MediaItem>> {
-        return mediaRepository.getAllMedia()
+    fun execute(albumId:String?): Flow<List<MediaItem>> {
+        return mediaRepository.getMediaItems(albumId)
     }
 }

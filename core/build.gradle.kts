@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.arslan.core"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 24
@@ -27,8 +27,17 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
     kotlinOptions {
         jvmTarget = "11"
+    }
+
+    buildFeatures {
+        compose = true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.15"
     }
 }
 
@@ -39,7 +48,10 @@ dependencies {
     // Optional common UI tools
     implementation(libs.lifecycle.runtime)
     implementation(libs.datastore.preferences)
-
+    implementation(libs.compose.ui)
+    implementation(libs.compose.ui.preview)
+    implementation(libs.androidx.activity.ktx)
+    implementation(libs.androidx.activity.compose)
     // Unit Testing
     testImplementation(libs.junit)
     testImplementation(libs.mockk)

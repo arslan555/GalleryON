@@ -7,12 +7,12 @@ plugins {
 
 android {
     namespace = "com.arslan.galleryon"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.arslan.galleryon"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -49,6 +49,10 @@ android {
 dependencies {
     // DI
     implementation(libs.hilt.android)
+    implementation(project(":feature:albums"))
+    implementation(project(":feature:media"))
+    implementation(project(":data"))
+    implementation(project(":core"))
     ksp(libs.hilt.compiler)
 
     // Jetpack Compose

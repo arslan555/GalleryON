@@ -1,4 +1,6 @@
 [versions]
+activityCompose = "1.10.1"
+core = "1.5.0"
 kotlin = "1.9.25"
 compose = "1.6.1"
 material3 = "1.1.2"
@@ -19,6 +21,11 @@ appcompat = "1.7.0"
 material = "1.12.0"
 lifecycleRuntimeComposeAndroid = "2.8.7"
 coil = "2.5.0"
+coreKtx = "1.6.1"
+runner = "1.5.2"
+runtimeAndroid = "1.8.0"
+activityKtx = "1.10.1"
+activityKtxVersion = "1.10.1"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -31,9 +38,13 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 
 [libraries]
 # core
+androidx-activity-ktx = { group = "androidx.activity", name = "activity-ktx", version.ref = "activityKtxVersion" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
+androidx-core = { module = "androidx.test:core", version.ref = "core" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version = "1.12.0" }
 
 # Lifecycle
+androidx-runner = { module = "androidx.test:runner", version.ref = "runner" }
 lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
 lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
 
@@ -43,7 +54,6 @@ compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", versi
 compose-ui-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview", version.ref = "compose" }
 compose-runtime = { module = "androidx.compose.runtime:runtime", version.ref = "compose" }
 compose-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
-material3-icons-core = "androidx.compose.material3:material3-icons-core:1.2.0"
 material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 compose-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4", version.ref = "compose" }
 compose-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest", version.ref = "compose" }

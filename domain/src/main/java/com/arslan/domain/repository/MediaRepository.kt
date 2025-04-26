@@ -7,9 +7,9 @@ import kotlinx.coroutines.flow.Flow
 interface MediaRepository {
 
     /**
-     * Returns a list of all media items (images and videos).
+     * Returns a list of media items for specific albums (images and videos).
      */
-    fun getAllMedia(): Flow<List<MediaItem>>
+    fun getMediaItems(albumId: String?): Flow<List<MediaItem>>
 
     /**
      * Returns a list of albums, each containing grouped media items.

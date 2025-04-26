@@ -3,8 +3,9 @@ package com.arslan.domain.usecase.albums
 import com.arslan.domain.model.album.AlbumItem
 import com.arslan.domain.repository.MediaRepository
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 
-class GetAlbumsUseCase(
+class GetAlbumsUseCase  @Inject constructor(
     private val mediaRepository: MediaRepository
 ) {
     fun execute(): Flow<List<AlbumItem>> {
