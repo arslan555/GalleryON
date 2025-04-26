@@ -7,12 +7,12 @@ plugins {
 
 android {
     namespace = "com.arslan.galleryon"
-    compileSdk = 35
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.arslan.galleryon"
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

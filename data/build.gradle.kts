@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.arslan.data"
-    compileSdk = 35
+    compileSdk = 34
 
     defaultConfig {
         minSdk = 24

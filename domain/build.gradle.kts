@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.arslan.domain"
-    compileSdk = 35
+    compileSdk = 34
 
     defaultConfig {
         minSdk = 24
