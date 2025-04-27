@@ -1,5 +1,6 @@
 package com.arslan.data.di
 import android.content.Context
+import com.arslan.data.media.MediaManager
 import com.arslan.data.repository.MediaRepositoryImpl
 import com.arslan.domain.repository.MediaRepository
 import dagger.Module
@@ -15,9 +16,17 @@ object RepositoryModule {
 
     @Provides
     @Singleton
-    fun provideMediaRepository(
+    fun provideMediaManager(
         @ApplicationContext context: Context
+    ): MediaManager {
+        return MediaManager(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideMediaRepository(
+        mediaManager: MediaManager
     ): MediaRepository {
-        return MediaRepositoryImpl(context)
+        return MediaRepositoryImpl(mediaManager)
     }
 }

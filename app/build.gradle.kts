@@ -25,6 +25,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
 
@@ -55,11 +56,16 @@ dependencies {
     implementation(project(":core"))
     ksp(libs.hilt.compiler)
 
-    // Jetpack Compose
+    // Use BOM
+    implementation(platform(libs.compose.bom))
+
+    // Compose dependencies
     implementation(libs.compose.ui)
     implementation(libs.compose.material3)
+    implementation(libs.compose.runtime)
+    implementation(libs.compose.ui.tooling)
     implementation(libs.compose.ui.preview)
-    debugImplementation(libs.compose.ui.tooling)
+    implementation(libs.compose.navigation)
 
     // Lifecycle & ViewModel
     implementation(libs.lifecycle.viewmodel)
@@ -67,9 +73,6 @@ dependencies {
 
     // Coroutines
     implementation(libs.coroutines.android)
-
-    // Navigation
-    implementation(libs.navigation.compose)
 
     // Media, Permissions & Data
     implementation(libs.media3.common)

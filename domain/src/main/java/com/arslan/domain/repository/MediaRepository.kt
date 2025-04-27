@@ -5,14 +5,9 @@ import com.arslan.domain.model.media.MediaItem
 import kotlinx.coroutines.flow.Flow
 
 interface MediaRepository {
-
-    /**
-     * Returns a list of media items for specific albums (images and videos).
-     */
-    fun getMediaItems(albumId: String?): Flow<List<MediaItem>>
-
-    /**
-     * Returns a list of albums, each containing grouped media items.
-     */
-    fun getAlbums(): Flow<List<AlbumItem>>
+   /*
+    **
+    * Returns a list of media items (images and videos).
+    */
+    fun getAllMediaItems(): Flow<List<MediaItem>>
 }

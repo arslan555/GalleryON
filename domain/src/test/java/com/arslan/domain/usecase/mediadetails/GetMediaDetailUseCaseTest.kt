@@ -1,6 +1,6 @@
-package com.arslan.domain.usecase.albums
+package com.arslan.domain.usecase.mediadetails
+
 import app.cash.turbine.test
-import com.arslan.domain.model.album.AlbumItem
 import com.arslan.domain.model.media.MediaItem
 import com.arslan.domain.model.media.MediaType
 import com.arslan.domain.repository.MediaRepository
@@ -10,14 +10,15 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class GetAlbumsUseCaseTest {
+class GetMediaDetailUseCaseTest {
 
     private lateinit var mediaRepository: MediaRepository
-    private lateinit var getAlbumsUseCase: GetAlbumsUseCase
+    private lateinit var getMediaDetailUseCase: GetMediaDetailUseCase
 
     private val fakeMediaItems = listOf(
         MediaItem(
@@ -46,26 +47,26 @@ class GetAlbumsUseCaseTest {
     fun setUp() {
         mediaRepository = mockk()
         coEvery { mediaRepository.getAllMediaItems() } returns flowOf(fakeMediaItems)
-        getAlbumsUseCase = GetAlbumsUseCase(mediaRepository)
+        getMediaDetailUseCase = GetMediaDetailUseCase(mediaRepository)
     }
 
     @Test
-    fun `execute returns list of albums grouped by folderName`() = runTest {
-        getAlbumsUseCase.execute().test {
-            val albums = awaitItem()
+    fun `execute returns correct MediaItem when ID exists`() = runTest {
+        getMediaDetailUseCase.execute(2L).test {
+            val result = awaitItem()
 
-            assertEquals(2, albums.size)
+            assertEquals("Video1", result?.name)
+            assertEquals(2L, result?.id)
+            awaitComplete()
+        }
+    }
 
-            val firstAlbum = albums[0]
-            val secondAlbum = albums[1]
+    @Test
+    fun `execute returns null when ID does not exist`() = runTest {
+        getMediaDetailUseCase.execute(999L).test {
+            val result = awaitItem()
 
-            // Highest dateTaken comes first
-            assertEquals("Videos", firstAlbum.name)
-            assertEquals(1, firstAlbum.mediaItems.size)
-
-            assertEquals("Camera", secondAlbum.name)
-            assertEquals(1, secondAlbum.mediaItems.size)
-
+            assertNull(result)
             awaitComplete()
         }
     }

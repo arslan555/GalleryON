@@ -51,6 +51,7 @@ dependencies {
     // Unit Testing
     testImplementation(libs.junit)
     testImplementation(libs.mockk)
+    testImplementation(libs.turbine)
     testImplementation(libs.coroutines.test)
     androidTestImplementation(libs.junit)
     androidTestImplementation(libs.coroutines.test)

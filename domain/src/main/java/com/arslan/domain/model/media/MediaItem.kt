@@ -1,5 +1,8 @@
 package com.arslan.domain.model.media
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+@Parcelize
 data class MediaItem(
     val id: Long,
     val name: String,
@@ -9,10 +12,12 @@ data class MediaItem(
     val folderName: String?,
     val size: Long?,
     val duration: Long? // Only relevant for videos
-)
+): Parcelable
 
-// Sealed class instead of enum for better control and extension
-sealed interface MediaType {
+@Parcelize
+sealed interface MediaType: Parcelable {
+    @Parcelize
     data object Image : MediaType
+    @Parcelize
     data object Video : MediaType
 }

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.arslan.domain.usecase.albums.GetAlbumsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,7 +26,7 @@ class AlbumsViewModel @Inject constructor(
     }
 
     private fun loadAlbums() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             getAlbumsUseCase.execute()
                 .onStart {
                     _state.value = AlbumsState.Loading

@@ -44,6 +44,8 @@ android {
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.coroutines.android)
+// Use BOM
+    implementation(platform(libs.compose.bom))
 
     // Optional common UI tools
     implementation(libs.lifecycle.runtime)
@@ -52,6 +54,9 @@ dependencies {
     implementation(libs.compose.ui.preview)
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.navigation.runtime.ktx)
+    implementation(libs.androidx.material3.android)
+    implementation(libs.androidx.foundation.android)
     // Unit Testing
     testImplementation(libs.junit)
     testImplementation(libs.mockk)

@@ -1,17 +1,15 @@
 package com.arslan.feature.albums.presentation.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
@@ -32,7 +30,7 @@ fun AlbumCardItem(
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
-        Column {
+        Box {
             AsyncImage(
                 model = album.coverUri,
                 contentDescription = album.name,
@@ -42,20 +40,34 @@ fun AlbumCardItem(
                     .aspectRatio(1f)
             )
 
-            Column(
-                modifier = Modifier.padding(8.dp)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter)
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(
+                                Color.Transparent,
+                                Color(0xAA000000) // Semi-black gradient at bottom
+                            )
+                        )
+                    )
+                    .padding(8.dp)
             ) {
-                Text(
-                    text = album.name,
-                    style = MaterialTheme.typography.titleMedium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Text(
-                    text = "${album.mediaCount} items",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = Color.Gray
-                )
+                Column {
+                    Text(
+                        text = album.name,
+                        style = MaterialTheme.typography.bodyLarge.copy(color = Color.White),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Text(
+                        text = "${album.mediaCount} items",
+                        style = MaterialTheme.typography.bodySmall.copy(color = Color.LightGray),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
             }
         }
     }
