@@ -33,9 +33,9 @@ GalleryOn is a native Android application built in **Kotlin**, designed to showc
 
 ## 📸 Screenshots
 
-| Launcher Screen (Day) | Launcher Screen (Night) | Albums Screen (Day) | Albums Screen (Night) | Media List Screen (Day) | Media List Screen (Night) | Media Detail Screen (Day) | Media Detail Screen (Night) |
-|:---------------------:|:-----------------------:|:-------------------:|:---------------------:|:-----------------------:|:-------------------------:|:-------------------------:|:---------------------------:|
-| <img src="screenshots/launcher_day.png" width="200" height="400"/> | <img src="screenshots/launcher_night.png" width="200" height="400"/> | <img src="screenshots/albums_day.png" width="200" height="400"/> | <img src="screenshots/albums_night.png" width="200" height="400"/> | <img src="screenshots/media_list_day.png" width="200" height="400"/> | <img src="screenshots/media_list_night.png" width="200" height="400"/> | <img src="screenshots/media_detail_day.png" width="200" height="400"/> | <img src="screenshots/media_detail_night.png" width="200" height="400"/> |
+|                       Launcher Screen (Day)                        | Launcher Screen (Night) | Albums Screen (Day) | Albums Screen (Night) | Media List Screen (Day) | Media List Screen (Night) | Media Detail Screen (Day) | Media Detail Screen (Night) |
+|:------------------------------------------------------------------:|:-----------------------:|:-------------------:|:---------------------:|:-----------------------:|:-------------------------:|:-------------------------:|:---------------------------:|
+| <img src="screenshots/day/launcher.png" width="200" height="400"/> | <img src="screenshots/day/launcher.png" width="200" height="400"/> | <img src="screenshots/albums_day.png" width="200" height="400"/> | <img src="screenshots/albums_night.png" width="200" height="400"/> | <img src="screenshots/media_list_day.png" width="200" height="400"/> | <img src="screenshots/media_list_night.png" width="200" height="400"/> | <img src="screenshots/media_detail_day.png" width="200" height="400"/> | <img src="screenshots/media_detail_night.png" width="200" height="400"/> |
 
 > (🖼️ Replace with your actual day/night mode screenshots inside the `/screenshots` folder.)
 
