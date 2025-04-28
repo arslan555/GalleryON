@@ -37,15 +37,15 @@ GalleryOn is a native Android application built in **Kotlin**, designed to showc
 
 | Launcher Screen |                          Album Screen (Grid)                          |                          Album Screen (List)                          |                        Media List Screen                        |                          Media Detail Screen                           |
 |:---------------:|:---------------------------------------------------------------------:|:---------------------------------------------------------------------:|:---------------------------------------------------------------:|:----------------------------------------------------------------------:|
-| <img src="screenshots/day/launcher.png" width="300" height="400"/> | <img src="screenshots/day/albums-grid.png" width="300" height="400"/> | <img src="screenshots/day/albums-list.png" width="300" height="400"/> | <img src="screenshots/day/media.png" width="300" height="400"/> | <img src="screenshots/day/media-detail.png" width="300" height="400"/> |
+| <img src="screenshots/day/launcher.png" width="400" height="300"/> | <img src="screenshots/day/albums-grid.png" width="400" height="300"/> | <img src="screenshots/day/albums-list.png" width="400" height="300"/> | <img src="screenshots/day/media.png" width="400" height="300"/> | <img src="screenshots/day/media-detail.png" width="400" height="300"/> |
 
----
+
 
 ### 🌙 Dark Mode
 
 | Launcher Screen |                           Album Screen (Grid)                           |                           Album Screen (List)                           |                         Media List Screen                         |                           Media Detail Screen                            |
 |:---------------:|:-----------------------------------------------------------------------:|:-----------------------------------------------------------------------:|:-----------------------------------------------------------------:|:------------------------------------------------------------------------:|
-| <img src="screenshots/night/launcher.png" width="300" height="400"/> | <img src="screenshots/night/albums-grid.png" width="300" height="400"/> | <img src="screenshots/night/albums-list.png" width="300" height="400"/> | <img src="screenshots/night/media.png" width="300" height="400"/> | <img src="screenshots/night/media-detail.png" width="300" height="400"/> |
+| <img src="screenshots/night/launcher.png" width="400" height="300"/> | <img src="screenshots/night/albums-grid.png" width="400" height="300"/> | <img src="screenshots/night/albums-list.png" width="400" height="300"/> | <img src="screenshots/night/media.png" width="400" height="300"/> | <img src="screenshots/night/media-detail.png" width="400" height="300"/> |
 
 
 
@@ -81,11 +81,6 @@ Maintains strict separation of concerns between layers.
 - **JUnit4** — Unit testing framework.
 - **MockK** — Mocks/stubs for testing.
 - **Turbine** — Test Kotlin Flow emissions.
-
-##### 📊 Code Coverage Example
-
-<img src="screenshots/code_coverage.png" width="800" height="400" />
-
 
 
 ## 🧪 Testing Strategy
