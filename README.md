@@ -39,7 +39,7 @@ GalleryOn is a native Android application built in **Kotlin**, designed to showc
 |:---------------:|:---------------------------------------------------------------------:|:---------------------------------------------------------------------:|:---------------------------------------------------------------:|:----------------------------------------------------------------------:|
 | <img src="screenshots/day/launcher.png" width="300" height="400"/> | <img src="screenshots/day/albums-grid.png" width="300" height="400"/> | <img src="screenshots/day/albums-list.png" width="300" height="400"/> | <img src="screenshots/day/media.png" width="300" height="400"/> | <img src="screenshots/day/media-detail.png" width="300" height="400"/> |
 
----
+
 
 ### 🌙 Dark Mode
 
@@ -81,11 +81,6 @@ Maintains strict separation of concerns between layers.
 - **JUnit4** — Unit testing framework.
 - **MockK** — Mocks/stubs for testing.
 - **Turbine** — Test Kotlin Flow emissions.
-
-##### 📊 Code Coverage Example
-
-<img src="screenshots/code_coverage.png" width="800" height="400" />
-
 
 
 ## 🧪 Testing Strategy
