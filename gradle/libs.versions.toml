@@ -11,7 +11,6 @@ navigation = "2.7.6"
 accompanist = "0.34.0"
 hilt = "2.48"
 media3 = "1.2.1"
-datastore = "1.0.0"
 mockk = "1.13.8"
 junit = "4.13.2"
 agp = "8.2.0"
@@ -90,8 +89,6 @@ accompanist-permissions = { group = "com.google.accompanist", name = "accompanis
 # Media3
 media3-common = { group = "androidx.media3", name = "media3-common", version.ref = "media3" }
 
-# DataStore
-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }
 
 #coil image loading
 coil-kt = { group = "io.coil-kt", name = "coil", version.ref = "coil" }

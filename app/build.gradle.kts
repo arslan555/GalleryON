@@ -77,7 +77,6 @@ dependencies {
     // Media, Permissions & Data
     implementation(libs.media3.common)
     implementation(libs.accompanist.permissions)
-    implementation(libs.datastore.preferences)
 
     // Unit Testing
     testImplementation(libs.junit)

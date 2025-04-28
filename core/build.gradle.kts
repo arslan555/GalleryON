@@ -49,7 +49,6 @@ dependencies {
 
     // Optional common UI tools
     implementation(libs.lifecycle.runtime)
-    implementation(libs.datastore.preferences)
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.preview)
     implementation(libs.androidx.activity.ktx)
