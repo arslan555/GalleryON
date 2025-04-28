@@ -5,8 +5,9 @@ GalleryOn is a native Android application built in **Kotlin**, designed to showc
 ![Android](https://img.shields.io/badge/Platform-Android-brightgreen?logo=android)
 ![Kotlin](https://img.shields.io/badge/Language-Kotlin-purple?logo=kotlin)
 ![Jetpack Compose](https://img.shields.io/badge/UI-Jetpack%20Compose-blue?logo=jetpackcompose)
-![MVVM](https://img.shields.io/badge/Architecture-MVVM-orange)
----
+![MVI](https://img.shields.io/badge/Architecture-MVI-orange)
+![MediaStore](https://img.shields.io/badge/Storage-MediaStore-yellow)
+![Unit Tests](https://img.shields.io/badge/Tests-Unit%20Tests-blue)
 
 ## 📝 App Overview
 
@@ -29,7 +30,6 @@ GalleryOn is a native Android application built in **Kotlin**, designed to showc
 4.  **Permission Handling**
     * Requests appropriate storage permissions at runtime based on Android version.
 
----
 
 ## 📸 Screenshots
 
@@ -38,8 +38,6 @@ GalleryOn is a native Android application built in **Kotlin**, designed to showc
 | <img src="screenshots/day/launcher.png" width="200" height="400"/> | <img src="screenshots/day/launcher.png" width="200" height="400"/> | <img src="screenshots/albums_day.png" width="200" height="400"/> | <img src="screenshots/albums_night.png" width="200" height="400"/> | <img src="screenshots/media_list_day.png" width="200" height="400"/> | <img src="screenshots/media_list_night.png" width="200" height="400"/> | <img src="screenshots/media_detail_day.png" width="200" height="400"/> | <img src="screenshots/media_detail_night.png" width="200" height="400"/> |
 
 > (🖼️ Replace with your actual day/night mode screenshots inside the `/screenshots` folder.)
-
----
 
 
 ## 🧠 Architecture
@@ -58,7 +56,6 @@ Maintains strict separation of concerns between layers.
 | `feature/albums/`       | Albums screen, view models, UI components.               |
 | `feature/media/`        | Media listing screen, view models, UI components.        |
 
----
 
 ## 🚀 Libraries & Tech Stack
 
@@ -80,7 +77,6 @@ Maintains strict separation of concerns between layers.
 
 <img src="screenshots/code_coverage.png" width="800" height="400" />
 
----
 
 ## ✅ Features Implemented
 
@@ -91,7 +87,6 @@ Maintains strict separation of concerns between layers.
 * 🧪 Full unit test coverage for ViewModels and Repositories.
 * 🧹 Optimized clean code following SOLID principles.
 
----
 
 ## 🧪 Testing Strategy
 
@@ -114,15 +109,11 @@ All tests utilize `MockK`, `Turbine`, and `Compose Test APIs`.
 * Applied **Dagger-Hilt** for lightweight and easy-to-manage dependency injection.
 * Focused heavily on **testability**, **modularization**, and **best Kotlin practices** for long-term maintainability.
 
----
-
 ## 👨‍💻 Author
 
 **Mirza Arslan**<br>
 📧 mirzaarslan450@gmail.com<br>
 🔗 [LinkedIn](https://www.linkedin.com/in/mirza-arslan/)
-
----
 
 ## 🧭 Final Thoughts
 
