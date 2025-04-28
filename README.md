@@ -37,7 +37,7 @@ GalleryOn is a native Android application built in **Kotlin**, designed to showc
 
 | Launcher Screen |                          Album Screen (Grid)                          |                          Album Screen (List)                          |                        Media List Screen                        |                          Media Detail Screen                           |
 |:---------------:|:---------------------------------------------------------------------:|:---------------------------------------------------------------------:|:---------------------------------------------------------------:|:----------------------------------------------------------------------:|
-| <img src="screenshots/day/launcher.png" width="250" height="400"/> | <img src="screenshots/day/albums-grid.png" width="250" height="400"/> | <img src="screenshots/day/albums-list.png" width="250" height="400"/> | <img src="screenshots/day/media.png" width="250" height="400"/> | <img src="screenshots/day/media-detail.png" width="250" height="400"/> |
+| <img src="screenshots/day/launcher.png" width="300" height="400"/> | <img src="screenshots/day/albums-grid.png" width="300" height="400"/> | <img src="screenshots/day/albums-list.png" width="300" height="400"/> | <img src="screenshots/day/media.png" width="300" height="400"/> | <img src="screenshots/day/media-detail.png" width="300" height="400"/> |
 
 ---
 
@@ -45,7 +45,7 @@ GalleryOn is a native Android application built in **Kotlin**, designed to showc
 
 | Launcher Screen |                           Album Screen (Grid)                           |                           Album Screen (List)                           |                         Media List Screen                         |                           Media Detail Screen                            |
 |:---------------:|:-----------------------------------------------------------------------:|:-----------------------------------------------------------------------:|:-----------------------------------------------------------------:|:------------------------------------------------------------------------:|
-| <img src="screenshots/night/launcher.png" width="250" height="400"/> | <img src="screenshots/night/albums-grid.png" width="250" height="400"/> | <img src="screenshots/night/albums-list.png" width="250" height="400"/> | <img src="screenshots/night/media.png" width="250" height="400"/> | <img src="screenshots/night/media-detail.png" width="250" height="400"/> |
+| <img src="screenshots/night/launcher.png" width="300" height="400"/> | <img src="screenshots/night/albums-grid.png" width="300" height="400"/> | <img src="screenshots/night/albums-list.png" width="300" height="400"/> | <img src="screenshots/night/media.png" width="300" height="400"/> | <img src="screenshots/night/media-detail.png" width="300" height="400"/> |
 
 
 
