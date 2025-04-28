@@ -33,11 +33,23 @@ GalleryOn is a native Android application built in **Kotlin**, designed to showc
 
 ## 📸 Screenshots
 
-|                       Launcher Screen (Day)                        | Launcher Screen (Night) | Albums Screen (Day) | Albums Screen (Night) | Media List Screen (Day) | Media List Screen (Night) | Media Detail Screen (Day) | Media Detail Screen (Night) |
-|:------------------------------------------------------------------:|:-----------------------:|:-------------------:|:---------------------:|:-----------------------:|:-------------------------:|:-------------------------:|:---------------------------:|
-| <img src="screenshots/day/launcher.png" width="200" height="400"/> | <img src="screenshots/day/launcher.png" width="200" height="400"/> | <img src="screenshots/albums_day.png" width="200" height="400"/> | <img src="screenshots/albums_night.png" width="200" height="400"/> | <img src="screenshots/media_list_day.png" width="200" height="400"/> | <img src="screenshots/media_list_night.png" width="200" height="400"/> | <img src="screenshots/media_detail_day.png" width="200" height="400"/> | <img src="screenshots/media_detail_night.png" width="200" height="400"/> |
+### ☀️ Light Mode
+
+| Launcher Screen |                         Album Screen (Grid)                          |                         Album Screen (List)                          |                        Media List Screen                        |                          Media Detail Screen                           |
+|:---------------:|:--------------------------------------------------------------------:|:--------------------------------------------------------------------:|:---------------------------------------------------------------:|:----------------------------------------------------------------------:|
+| <img src="screenshots/day/launcher.png" width="250" height="500"/> | <img src="screenshots/day/album-grid.png" width="250" height="500"/> | <img src="screenshots/day/album-list.png" width="250" height="500"/> | <img src="screenshots/day/media.png" width="250" height="500"/> | <img src="screenshots/day/media-detail.png" width="250" height="500"/> |
+
+---
+
+### 🌙 Dark Mode
+
+| Launcher Screen |                          Album Screen (Grid)                           |                          Album Screen (List)                           |                         Media List Screen                         |                           Media Detail Screen                            |
+|:---------------:|:----------------------------------------------------------------------:|:----------------------------------------------------------------------:|:-----------------------------------------------------------------:|:------------------------------------------------------------------------:|
+| <img src="screenshots/night/launcher.png" width="250" height="500"/> | <img src="screenshots/night/album-grid.png" width="250" height="500"/> | <img src="screenshots/night/album-list.png" width="250" height="500"/> | <img src="screenshots/night/media.png" width="250" height="500"/> | <img src="screenshots/night/media-detail.png" width="250" height="500"/> |
 
 > (🖼️ Replace with your actual day/night mode screenshots inside the `/screenshots` folder.)
+
+
 
 
 ## 🧠 Architecture
