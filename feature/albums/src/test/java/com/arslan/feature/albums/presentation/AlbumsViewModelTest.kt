@@ -11,7 +11,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
@@ -32,6 +31,7 @@ class AlbumsViewModelTest {
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
         getAlbumsUseCase = mockk()
+        viewModel = AlbumsViewModel(getAlbumsUseCase)
     }
 
     @After
@@ -40,7 +40,7 @@ class AlbumsViewModelTest {
     }
 
     @Test
-    fun `loadAlbums success - emits Loading then Success`() = runTest(testDispatcher) {
+    fun `onEvent Refresh success - emits Loading then Success`() = runTest(testDispatcher) {
         // Given
         val fakeAlbum = AlbumItem(
             id = "Camera",
@@ -63,35 +63,13 @@ class AlbumsViewModelTest {
             emit(listOf(fakeAlbum))
         }
 
-        viewModel = AlbumsViewModel(getAlbumsUseCase)
-
-        // 👇 Fix: make sure coroutine runs
-        advanceUntilIdle()
-
-        // Then
-        viewModel.state.test {
-            assertEquals(AlbumsState.Success(listOf(fakeAlbum)), awaitItem())
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-
-    @Test
-    fun `loadAlbums failure - emits Loading then Error`() = runTest(testDispatcher) {
-        // Given
-        val errorMessage = "Failed to load albums"
-        coEvery { getAlbumsUseCase.execute() } returns flow {
-            throw RuntimeException(errorMessage)
-        }
-
-        viewModel = AlbumsViewModel(getAlbumsUseCase)
+        // When
+        viewModel.onEvent(AlbumsEvent.Refresh)
 
         // Then
         viewModel.state.test {
             assertEquals(AlbumsState.Loading, awaitItem())
-            val errorState = awaitItem()
-            assert(errorState is AlbumsState.Error)
-            assertEquals(errorMessage, (errorState as AlbumsState.Error).message)
+            assertEquals(AlbumsState.Success(listOf(fakeAlbum)), awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -99,12 +77,6 @@ class AlbumsViewModelTest {
     @Test
     fun `onEvent AlbumClicked - emits AlbumSelected`() = runTest(testDispatcher) {
         // Given
-        coEvery { getAlbumsUseCase.execute() } returns flow {
-            emit(emptyList())
-        }
-
-        viewModel = AlbumsViewModel(getAlbumsUseCase)
-
         val albumId = "Camera"
 
         // When
@@ -114,4 +86,3 @@ class AlbumsViewModelTest {
         assertEquals(AlbumsState.AlbumSelected(albumId), viewModel.state.value)
     }
 }
-

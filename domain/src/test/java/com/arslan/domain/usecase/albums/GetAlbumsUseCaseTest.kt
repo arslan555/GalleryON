@@ -1,19 +1,16 @@
 package com.arslan.domain.usecase.albums
 import app.cash.turbine.test
-import com.arslan.domain.model.album.AlbumItem
 import com.arslan.domain.model.media.MediaItem
 import com.arslan.domain.model.media.MediaType
 import com.arslan.domain.repository.MediaRepository
 import io.mockk.coEvery
 import io.mockk.mockk
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class GetAlbumsUseCaseTest {
 
     private lateinit var mediaRepository: MediaRepository

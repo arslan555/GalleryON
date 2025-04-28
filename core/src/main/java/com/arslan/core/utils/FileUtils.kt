@@ -1,8 +1,7 @@
 package com.arslan.core.utils
 
-import android.content.Context
-import android.media.browse.MediaBrowser
 import java.util.Locale
+
 object FileUtils {
      fun readableFileSize(size: Long): String {
         val units = arrayOf("B", "KB", "MB", "GB")
@@ -13,12 +12,5 @@ object FileUtils {
             unitIndex++
         }
         return String.format(Locale.getDefault(), "%.1f %s", sizeInUnit, units[unitIndex])
-    }
-
-     fun formatDuration(durationMillis: Long): String {
-        val seconds = durationMillis / 1000
-        val minutes = seconds / 60
-        val remainingSeconds = seconds % 60
-        return "%d:%02d".format(minutes, remainingSeconds)
     }
 }

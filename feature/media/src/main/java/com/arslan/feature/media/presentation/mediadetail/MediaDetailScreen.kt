@@ -17,7 +17,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -36,10 +36,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.arslan.core.utils.FileUtils.readableFileSize
+import com.arslan.core.utils.formatDate
 import com.arslan.domain.model.media.MediaItem
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,7 +60,7 @@ fun MediaDetailScreen(
                             .background(color = Color.Black.copy(alpha = 0.5f), shape = CircleShape)
                     ) {
                         Icon(
-                            imageVector = Icons.Filled.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back",
                             tint = Color.White
                         )
@@ -76,8 +74,7 @@ fun MediaDetailScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-//                .padding(innerPadding)
-                .consumeWindowInsets(innerPadding) // Good practice
+                .consumeWindowInsets(innerPadding)
         ) {
             // Full Media View
             AsyncImage(
@@ -113,8 +110,7 @@ fun MediaDetailScreen(
                         Text(
                             text = buildString {
                                 mediaItem.dateTaken?.let { dateMillis ->
-                                    val dateFormatted = SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(Date(dateMillis))
-                                    append(dateFormatted)
+                                    append(dateMillis.formatDate())
                                     append(" • ")
                                 }
                                 mediaItem.size?.let { size ->
@@ -130,7 +126,10 @@ fun MediaDetailScreen(
                         onClick = { onShareClick(mediaItem) },
                         modifier = Modifier
                             .size(48.dp)
-                            .background(color = MaterialTheme.colorScheme.primary, shape = CircleShape)
+                            .background(
+                                color = MaterialTheme.colorScheme.primary,
+                                shape = CircleShape
+                            )
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Share,

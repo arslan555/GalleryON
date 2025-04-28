@@ -7,7 +7,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.ViewModule
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -38,7 +38,7 @@ fun AlbumsScreen(
                 actions = {
                     IconButton(onClick = { isGrid = !isGrid }) {
                         Icon(
-                            imageVector = if (isGrid) Icons.Filled.List else Icons.Filled.ViewModule,
+                            imageVector = if (isGrid) Icons.AutoMirrored.Filled.List else Icons.Filled.ViewModule,
                             contentDescription = "Toggle View"
                         )
                     }

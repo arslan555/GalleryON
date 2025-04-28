@@ -21,10 +21,6 @@ class AlbumsViewModel @Inject constructor(
     private val _state = MutableStateFlow<AlbumsState>(AlbumsState.Loading)
     val state: StateFlow<AlbumsState> = _state.asStateFlow()
 
-    init {
-        loadAlbums()
-    }
-
     private fun loadAlbums() {
         viewModelScope.launch(Dispatchers.IO) {
             getAlbumsUseCase.execute()
