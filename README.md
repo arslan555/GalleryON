@@ -37,7 +37,7 @@ GalleryOn is a native Android application built in **Kotlin**, designed to showc
 
 | Launcher Screen |                          Album Screen (Grid)                          |                          Album Screen (List)                          |                        Media List Screen                        |                          Media Detail Screen                           |
 |:---------------:|:---------------------------------------------------------------------:|:---------------------------------------------------------------------:|:---------------------------------------------------------------:|:----------------------------------------------------------------------:|
-| <img src="screenshots/day/launcher.png" width="400" height="400"/> | <img src="screenshots/day/albums-grid.png" width="400" height="400"/> | <img src="screenshots/day/albums-list.png" width="400" height="400"/> | <img src="screenshots/day/media.png" width="400" height="400"/> | <img src="screenshots/day/media-detail.png" width="400" height="400"/> |
+| <img src="screenshots/day/launcher.png" width="400" height="350"/> | <img src="screenshots/day/albums-grid.png" width="400" height="350"/> | <img src="screenshots/day/albums-list.png" width="400" height="350"/> | <img src="screenshots/day/media.png" width="400" height="350"/> | <img src="screenshots/day/media-detail.png" width="400" height="350"/> |
 
 
 
