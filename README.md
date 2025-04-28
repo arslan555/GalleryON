@@ -35,17 +35,17 @@ GalleryOn is a native Android application built in **Kotlin**, designed to showc
 
 ### ☀️ Light Mode
 
-| Launcher Screen |                         Album Screen (Grid)                          |                         Album Screen (List)                          |                        Media List Screen                        |                          Media Detail Screen                           |
-|:---------------:|:--------------------------------------------------------------------:|:--------------------------------------------------------------------:|:---------------------------------------------------------------:|:----------------------------------------------------------------------:|
-| <img src="screenshots/day/launcher.png" width="250" height="500"/> | <img src="screenshots/day/album-grid.png" width="250" height="500"/> | <img src="screenshots/day/album-list.png" width="250" height="500"/> | <img src="screenshots/day/media.png" width="250" height="500"/> | <img src="screenshots/day/media-detail.png" width="250" height="500"/> |
+| Launcher Screen |                          Album Screen (Grid)                          |                          Album Screen (List)                          |                        Media List Screen                        |                          Media Detail Screen                           |
+|:---------------:|:---------------------------------------------------------------------:|:---------------------------------------------------------------------:|:---------------------------------------------------------------:|:----------------------------------------------------------------------:|
+| <img src="screenshots/day/launcher.png" width="250" height="500"/> | <img src="screenshots/day/albums-grid.png" width="250" height="500"/> | <img src="screenshots/day/albums-list.png" width="250" height="500"/> | <img src="screenshots/day/media.png" width="250" height="500"/> | <img src="screenshots/day/media-detail.png" width="250" height="500"/> |
 
 ---
 
 ### 🌙 Dark Mode
 
-| Launcher Screen |                          Album Screen (Grid)                           |                          Album Screen (List)                           |                         Media List Screen                         |                           Media Detail Screen                            |
-|:---------------:|:----------------------------------------------------------------------:|:----------------------------------------------------------------------:|:-----------------------------------------------------------------:|:------------------------------------------------------------------------:|
-| <img src="screenshots/night/launcher.png" width="250" height="500"/> | <img src="screenshots/night/album-grid.png" width="250" height="500"/> | <img src="screenshots/night/album-list.png" width="250" height="500"/> | <img src="screenshots/night/media.png" width="250" height="500"/> | <img src="screenshots/night/media-detail.png" width="250" height="500"/> |
+| Launcher Screen |                           Album Screen (Grid)                           |                           Album Screen (List)                           |                         Media List Screen                         |                           Media Detail Screen                            |
+|:---------------:|:-----------------------------------------------------------------------:|:-----------------------------------------------------------------------:|:-----------------------------------------------------------------:|:------------------------------------------------------------------------:|
+| <img src="screenshots/night/launcher.png" width="250" height="500"/> | <img src="screenshots/night/albums-grid.png" width="250" height="500"/> | <img src="screenshots/night/albums-list.png" width="250" height="500"/> | <img src="screenshots/night/media.png" width="250" height="500"/> | <img src="screenshots/night/media-detail.png" width="250" height="500"/> |
 
 > (🖼️ Replace with your actual day/night mode screenshots inside the `/screenshots` folder.)
 
