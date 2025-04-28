@@ -37,7 +37,7 @@ GalleryOn is a native Android application built in **Kotlin**, designed to showc
 
 | Launcher Screen |                          Album Screen (Grid)                          |                          Album Screen (List)                          |                        Media List Screen                        |                          Media Detail Screen                           |
 |:---------------:|:---------------------------------------------------------------------:|:---------------------------------------------------------------------:|:---------------------------------------------------------------:|:----------------------------------------------------------------------:|
-| <img src="screenshots/day/launcher.png" width="250" height="500"/> | <img src="screenshots/day/albums-grid.png" width="250" height="500"/> | <img src="screenshots/day/albums-list.png" width="250" height="500"/> | <img src="screenshots/day/media.png" width="250" height="500"/> | <img src="screenshots/day/media-detail.png" width="250" height="500"/> |
+| <img src="screenshots/day/launcher.png" width="250" height="400"/> | <img src="screenshots/day/albums-grid.png" width="250" height="400"/> | <img src="screenshots/day/albums-list.png" width="250" height="400"/> | <img src="screenshots/day/media.png" width="250" height="400"/> | <img src="screenshots/day/media-detail.png" width="250" height="400"/> |
 
 ---
 
@@ -45,10 +45,7 @@ GalleryOn is a native Android application built in **Kotlin**, designed to showc
 
 | Launcher Screen |                           Album Screen (Grid)                           |                           Album Screen (List)                           |                         Media List Screen                         |                           Media Detail Screen                            |
 |:---------------:|:-----------------------------------------------------------------------:|:-----------------------------------------------------------------------:|:-----------------------------------------------------------------:|:------------------------------------------------------------------------:|
-| <img src="screenshots/night/launcher.png" width="250" height="500"/> | <img src="screenshots/night/albums-grid.png" width="250" height="500"/> | <img src="screenshots/night/albums-list.png" width="250" height="500"/> | <img src="screenshots/night/media.png" width="250" height="500"/> | <img src="screenshots/night/media-detail.png" width="250" height="500"/> |
-
-> (🖼️ Replace with your actual day/night mode screenshots inside the `/screenshots` folder.)
-
+| <img src="screenshots/night/launcher.png" width="250" height="400"/> | <img src="screenshots/night/albums-grid.png" width="250" height="400"/> | <img src="screenshots/night/albums-list.png" width="250" height="400"/> | <img src="screenshots/night/media.png" width="250" height="400"/> | <img src="screenshots/night/media-detail.png" width="250" height="400"/> |
 
 
 
@@ -90,15 +87,6 @@ Maintains strict separation of concerns between layers.
 <img src="screenshots/code_coverage.png" width="800" height="400" />
 
 
-## ✅ Features Implemented
-
-* 📁 Display albums grouped by folder.
-* 🔄 Switch between **Grid** and **List** layout.
-* Display media items & media item detail.
-* 🔐 Handles permission requests dynamically.
-* 🧪 Full unit test coverage for ViewModels and Repositories.
-* 🧹 Optimized clean code following SOLID principles.
-
 
 ## 🧪 Testing Strategy
 
@@ -111,7 +99,7 @@ Maintains strict separation of concerns between layers.
 All tests utilize `MockK`, `Turbine`, and `Compose Test APIs`.
 
 ```bash
-./gradlew clean testDebugUnitTest jacocoFullReport
+./gradlew clean test
 ```
 
 ## 💡 Thought Process
