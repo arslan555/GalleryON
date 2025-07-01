@@ -104,6 +104,25 @@ All tests utilize `MockK`, `Turbine`, and `Compose Test APIs`.
 * Applied **Dagger-Hilt** for lightweight and easy-to-manage dependency injection.
 * Focused heavily on **testability**, **modularization**, and **best Kotlin practices** for long-term maintainability.
 
+# 📌 GalleryOn – Phase 2 Feature Backlog
+
+| Priority | Feature                     | Module              | Description                                                                 | Status  | Target Milestone |
+|----------|-----------------------------|---------------------|-----------------------------------------------------------------------------|---------|------------------|
+| ⭐ High   | Smart Cleaner               | `feature-cleaner`   | Identify large files, duplicates, and low-quality media for cleanup.        | 🔜 Todo | v2.0.0           |
+| ⭐ High   | Album Management            | `feature-albums`    | Create, rename, and delete custom albums.                                   | 🔜 Todo | v2.0.0           |
+| ⭐ High   | Search Functionality        | `feature-search`    | Global search by name, date, tags, or file type.                            | 🔜 Todo | v2.1.0           |
+| ⭐ High   | Tagging System              | `feature-tagging`   | Let users assign tags and filter media accordingly.                         | 🔜 Todo | v2.1.0           |
+| ⭐ High   | Vault Mode (Private Albums) | `feature-vault`     | Add biometric-secured private albums.                                       | 🔜 Todo | v2.2.0           |
+| ⭐ High   | Cloud Backup Integration    | `feature-cloud`     | Optional Google Drive/Dropbox backup for media.                             | 🧪 Idea | v2.3.0           |
+| ⭐ Medium| Sort & Filter Controls      | `feature-media`     | Filter media by size, type, date; sort by date, name, or size.              | ✅ Done | v1.2.0           |
+| ⭐ Medium| AI Categorization            | `feature-ai`        | Use ML Kit to categorize photos (e.g., people, travel, food).               | 🧪 Idea | v2.4.0           |
+| ⭐ Medium| Media Editor Options         | `feature-edit`      | Crop, rotate, compress, or trim media within app.                           | 🧪 Idea | v2.5.0           |
+| ⭐ Medium| Crash Reporting              | `core-analytics`    | Firebase Crashlytics integration for error monitoring.                      | 🔜 Todo | v2.0.0           |
+| ⭐ Low   | Favorites View               | `feature-favorites` | Mark favorite media and access them quickly.                                | 🔜 Todo | v2.2.0           |
+| ⭐ Low   | Custom Themes                | `feature-theme`     | Offer user-selectable themes (light/dark/custom accent colors).             | 🔜 Todo | v2.6.0           |
+| ⭐ Low   | Sharing Suggestions          | `feature-share`     | Show nearby friends/devices to share media easily.                          | 🧪 Idea | v2.6.0           |
+
+
 ## 👨‍💻 Author
 
 **Mirza Arslan**<br>
