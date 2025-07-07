@@ -13,4 +13,14 @@ object FileUtils {
         }
         return String.format(Locale.getDefault(), "%.1f %s", sizeInUnit, units[unitIndex])
     }
+
+    fun formatSpaceSavings(bytes: Long): String {
+        val mb = bytes / (1024.0 * 1024.0)
+        val gb = bytes / (1024.0 * 1024.0 * 1024.0)
+        return if (gb >= 1) {
+            String.format(Locale.getDefault(), "%.2f GB", gb)
+        } else {
+            String.format(Locale.getDefault(), "%.2f MB", mb)
+        }
+    }
 }

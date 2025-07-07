@@ -50,6 +50,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.arslan.core.utils.FileUtils
 import com.arslan.domain.model.cleaner.CleanupItem
 import com.arslan.domain.model.cleaner.CleanupType
 
@@ -180,7 +181,7 @@ private fun SmartCleanerContent(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "${(state.totalSpaceSaved / (1024 * 1024))} MB",
+                    text = FileUtils.formatSpaceSavings(state.totalSpaceSaved),
                     style = MaterialTheme.typography.headlineMedium,
                     color = MaterialTheme.colorScheme.primary
                 )
