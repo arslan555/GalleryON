@@ -11,6 +11,9 @@ fun NavGraphBuilder.albumsNavigation(navController: NavHostController) {
         AlbumsScreen(
             onAlbumClick = { album ->
                 navController.navigate(NavigationRoutes.mediaRoute(album.id))
+            },
+            onSmartCleanerClick = {
+                navController.navigate(NavigationRoutes.SMART_CLEANER)
             }
         )
     }

@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.ViewModule
+import androidx.compose.material.icons.filled.CleaningServices
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -25,7 +26,8 @@ import com.arslan.feature.albums.presentation.components.AlbumListItem
 @Composable
 fun AlbumsScreen(
     viewModel: AlbumsViewModel = hiltViewModel(),
-    onAlbumClick: (AlbumItem) -> Unit
+    onAlbumClick: (AlbumItem) -> Unit,
+    onSmartCleanerClick: () -> Unit
 ) {
     var isGrid by rememberSaveable { mutableStateOf(true) }
     var hasPermission by remember { mutableStateOf(false) }
@@ -36,6 +38,12 @@ fun AlbumsScreen(
             TopAppBar(
                 title = { Text("Albums") },
                 actions = {
+                    IconButton(onClick = onSmartCleanerClick) {
+                        Icon(
+                            imageVector = Icons.Default.CleaningServices,
+                            contentDescription = "Smart Cleaner"
+                        )
+                    }
                     IconButton(onClick = { isGrid = !isGrid }) {
                         Icon(
                             imageVector = if (isGrid) Icons.AutoMirrored.Filled.List else Icons.Filled.ViewModule,

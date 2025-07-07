@@ -1,13 +1,14 @@
 package com.arslan.data.media
 
-
 import android.content.Context
 import android.database.Cursor
 import android.provider.MediaStore
 import com.arslan.domain.model.media.MediaItem
 import com.arslan.domain.model.media.MediaType
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -19,8 +20,8 @@ class MediaManager @Inject constructor(
     private val _allMediaItems = MutableStateFlow<List<MediaItem>>(emptyList())
     val allMediaItems = _allMediaItems.asStateFlow()
 
-     fun loadAllMedia() {
-        if (_allMediaItems.value.isNotEmpty()) return // Already loaded
+    suspend fun loadAllMedia() = withContext(Dispatchers.IO) {
+        if (_allMediaItems.value.isNotEmpty()) return@withContext // Already loaded
 
         val mediaItems = mutableListOf<MediaItem>()
 
@@ -92,6 +93,41 @@ class MediaManager @Inject constructor(
         }
 
         _allMediaItems.value = mediaItems
+    }
+
+    /**
+     * Get all images from the loaded media
+     */
+    fun getImages(): List<MediaItem> {
+        return allMediaItems.value.filter { it.mediaType == MediaType.Image }
+    }
+
+    /**
+     * Get all videos from the loaded media
+     */
+    private fun getVideos(): List<MediaItem> {
+        return allMediaItems.value.filter { it.mediaType == MediaType.Video }
+    }
+
+    /**
+     * Get media items older than specified timestamp
+     */
+    fun getOldMedia(cutoffTime: Long): List<MediaItem> {
+        return allMediaItems.value.filter { (it.dateTaken ?: 0) < cutoffTime }
+    }
+
+    /**
+     * Get large videos above specified size threshold
+     */
+    fun getLargeVideos(thresholdBytes: Long): List<MediaItem> {
+        return getVideos().filter { (it.size ?: 0) > thresholdBytes }
+    }
+
+    /**
+     * Clear cached media items (useful after deletions)
+     */
+    fun clearCache() {
+        _allMediaItems.value = emptyList()
     }
 
     private fun Cursor.getLongOrNull(columnIndex: Int): Long? {
