@@ -44,10 +44,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.arslan.core.utils.FileUtils.formatSize
 import com.arslan.domain.model.cleaner.CleanupItem
 import com.arslan.domain.model.cleaner.CleanupType
 import com.arslan.domain.model.media.MediaItem
@@ -64,11 +66,19 @@ fun SmartCleanerScreen(
     val screenState by viewModel.screenState.collectAsStateWithLifecycle()
     val selectedItems by viewModel.selectedItems.collectAsStateWithLifecycle()
     var selectedCategory by remember { mutableStateOf<CleanerCategory>(CleanerCategory.Duplicates) }
-    
-    // The ActivityProvider automatically tracks the current activity
-    // and the MediaDeletionHelper uses it for deletion
-    // The result is handled through the callback mechanism in the ViewModel
-    
+
+    // Calculate reclaimable storage
+    val duplicateReclaimable = screenState.duplicates.items.sumOf { group ->
+        group.mediaItems.drop(1).sumOf { it.size ?: 0L }
+    }
+    val largeVideosReclaimable = screenState.largeMedia.items.sumOf { item ->
+        item.mediaItems.sumOf { it.size ?: 0L }
+    }
+    val oldMediaReclaimable = screenState.oldMedia.items.sumOf { item ->
+        item.mediaItems.sumOf { it.size ?: 0L }
+    }
+    val totalReclaimable = duplicateReclaimable + largeVideosReclaimable + oldMediaReclaimable
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -92,14 +102,41 @@ fun SmartCleanerScreen(
                 .padding(paddingValues)
                 .padding(16.dp)
         ) {
+            // Header Card
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+            ) {
+                Column(
+                    modifier = Modifier.padding(20.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "Potential Space to Free",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        textAlign = TextAlign.Center
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = formatSize(totalReclaimable),
+                        style = MaterialTheme.typography.displaySmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
+
             // Category Selection Chips
             CategoryChips(
                 selectedCategory = selectedCategory,
                 onCategorySelected = { selectedCategory = it }
             )
-            
+
             Spacer(modifier = Modifier.height(24.dp))
-            
+
             // Content based on selected category
             when (selectedCategory) {
                 is CleanerCategory.Duplicates -> {
@@ -172,7 +209,7 @@ fun CategoryChips(
                 selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer
             )
         )
-        
+
         FilterChip(
             selected = selectedCategory is CleanerCategory.LargeVideos,
             onClick = { onCategorySelected(CleanerCategory.LargeVideos) },
@@ -193,7 +230,7 @@ fun CategoryChips(
                 selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer
             )
         )
-        
+
         FilterChip(
             selected = selectedCategory is CleanerCategory.OldMedia,
             onClick = { onCategorySelected(CleanerCategory.OldMedia) },
@@ -234,7 +271,7 @@ fun CategoryContent(
         fontWeight = FontWeight.Bold,
         modifier = Modifier.padding(bottom = 16.dp)
     )
-    
+
     // Selection and delete buttons row
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -263,9 +300,9 @@ fun CategoryContent(
             Text("Delete (${selectedItems.size})")
         }
     }
-    
+
     Spacer(modifier = Modifier.height(16.dp))
-    
+
     when {
         state.isLoading -> {
             Box(
@@ -319,9 +356,9 @@ private fun CleanupItemCard(
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = if (isSelected) 
-                MaterialTheme.colorScheme.primaryContainer 
-            else 
+            containerColor = if (isSelected)
+                MaterialTheme.colorScheme.primaryContainer
+            else
                 MaterialTheme.colorScheme.surface
         )
     ) {
@@ -335,9 +372,9 @@ private fun CleanupItemCard(
                 checked = isSelected,
                 onCheckedChange = onSelectionChanged
             )
-            
+
             Spacer(modifier = Modifier.width(16.dp))
-            
+
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = cleanupItem.displayName,
@@ -351,7 +388,7 @@ private fun CleanupItemCard(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            
+
             Icon(
                 when (cleanupItem.cleanupType) {
                     is CleanupType.Duplicates -> Icons.Default.PhotoLibrary
@@ -494,7 +531,7 @@ private fun createPreviewCleanupItem(
             duration = null
         )
     }
-    
+
     return CleanupItem(
         id = id,
         mediaItems = mockMediaItems,
