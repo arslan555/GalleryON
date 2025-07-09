@@ -20,13 +20,14 @@ The **Smart Cleaner** is a powerful feature that helps users identify and clean 
 - **Modern Material 3 Design**: Beautiful, intuitive UI with dark/light theme support
 - **Selective Cleanup**: Choose specific items or categories to delete
 - **Bulk Operations**: Select all or clear all selections with one tap
-- **Filter Options**: Scan for specific types of cleanup items
+- **Category Filtering**: Switch between Duplicates, Large Videos, and Old Media
 - **Progress Indicators**: Shows loading and deletion progress
 
 ### ⚡ **Performance Optimizations**
 - **Cached Media Data**: Single MediaStore query with efficient in-memory filtering
 - **Configurable Thresholds**: Adjustable parameters for different use cases
 - **Efficient Flow Handling**: Using `combine` for optimal performance
+- **Smart UI Updates**: Atomic state updates for better performance
 
 ## 🏗️ Architecture
 
@@ -34,10 +35,11 @@ The **Smart Cleaner** is a powerful feature that helps users identify and clean 
 ```
 feature/smart-cleaner/
 ├── presentation/
-│   ├── SmartCleanerScreen.kt      # Main UI screen
-│   ├── SmartCleanerViewModel.kt   # Business logic
+│   ├── SmartCleanerScreen.kt      # Main UI screen with category filtering
+│   ├── SmartCleanerViewModel.kt   # Business logic with generalized methods
 │   ├── SmartCleanerState.kt       # UI state management
-│   └── SmartCleanerEvent.kt       # User interactions
+│   ├── SmartCleanerEvent.kt       # User interactions
+│   └── CleanerCategory.kt         # Sealed interface for categories
 ├── navigation/
 │   └── SmartCleanerNavigation.kt  # Navigation setup
 └── build.gradle.kts               # Module dependencies
@@ -54,7 +56,6 @@ domain/
     ├── FindDuplicateImagesUseCase.kt
     ├── FindLargeVideosUseCase.kt
     ├── FindOldMediaUseCase.kt
-    ├── GetAllCleanupItemsUseCase.kt
     └── DeleteMediaItemsUseCase.kt
 ```
 
@@ -68,6 +69,63 @@ data/
 ```
 
 ## 🔧 **Technical Implementation**
+
+### **Sealed Interface for Categories**
+```kotlin
+sealed interface CleanerCategory {
+    data object Duplicates : CleanerCategory
+    data object LargeVideos : CleanerCategory
+    data object OldMedia : CleanerCategory
+}
+```
+
+### **Generalized Selection Management**
+```kotlin
+// Unified selection state for all categories
+private val _selectedItems = MutableStateFlow<Map<CleanerCategory, Set<String>>>(emptyMap())
+
+// Generalized methods for all categories
+fun toggleSelection(category: CleanerCategory, itemId: String, selected: Boolean)
+fun selectAll(category: CleanerCategory, items: List<CleanupItem>)
+fun clearAll(category: CleanerCategory)
+fun deleteSelected(category: CleanerCategory)
+```
+
+### **Smart UI Updates**
+```kotlin
+private fun updateUIAfterDeletion(deletedItemIds: List<Long>) {
+    viewModelScope.launch {
+        // Helper function to update cleanup items
+        fun updateCleanupItems(items: List<CleanupItem>, minRemainingItems: Int = 1): List<CleanupItem> {
+            return items.mapNotNull { cleanupItem ->
+                val remainingItems = cleanupItem.mediaItems.filter { it.id !in deletedItemIds }
+                if (remainingItems.size >= minRemainingItems) {
+                    cleanupItem.copy(
+                        mediaItems = remainingItems,
+                        itemCount = remainingItems.size,
+                        totalSize = remainingItems.sumOf { it.size ?: 0 }
+                    )
+                } else null
+            }
+        }
+
+        // Update all categories in a single atomic state update
+        _screenState.update { currentState ->
+            currentState.copy(
+                duplicates = currentState.duplicates.copy(
+                    items = updateCleanupItems(currentState.duplicates.items, minRemainingItems = 2)
+                ),
+                largeMedia = currentState.largeMedia.copy(
+                    items = updateCleanupItems(currentState.largeMedia.items)
+                ),
+                oldMedia = currentState.oldMedia.copy(
+                    items = updateCleanupItems(currentState.oldMedia.items)
+                )
+            )
+        }
+    }
+}
+```
 
 ### **MediaManager Integration**
 The Smart Cleaner properly leverages the existing `MediaManager` for efficient media handling:
@@ -137,17 +195,17 @@ private fun calculateImageHash(imageUri: String): String {
 
 ### **State Management**
 ```kotlin
-sealed interface SmartCleanerState {
-    data object Loading : SmartCleanerState
-    data class Success(
-        val cleanupItems: List<CleanupItem>,
-        val totalSpaceSaved: Long,
-        val selectedItems: Set<String> = emptySet()
-    ) : SmartCleanerState
-    data class Error(val message: String) : SmartCleanerState
-    data object Deleting : SmartCleanerState
-    data class DeletionComplete(val deletedCount: Int) : SmartCleanerState
-}
+data class SmartCleanerScreenState(
+    val duplicates: CleanerCategoryState = CleanerCategoryState(isLoading = true),
+    val largeMedia: CleanerCategoryState = CleanerCategoryState(isLoading = true),
+    val oldMedia: CleanerCategoryState = CleanerCategoryState(isLoading = true)
+)
+
+data class CleanerCategoryState(
+    val isLoading: Boolean = false,
+    val items: List<CleanupItem> = emptyList(),
+    val error: String? = null
+)
 ```
 
 ## 🚀 Usage
@@ -159,9 +217,9 @@ sealed interface SmartCleanerState {
 4. The app will automatically scan for cleanup opportunities
 
 ### **Using the Interface**
-1. **Review Results**: See potential space savings and item counts
-2. **Select Items**: Choose specific cleanup groups or use "Select All"
-3. **Filter Options**: Use filter chips to scan for specific types
+1. **Category Selection**: Use filter chips to switch between Duplicates, Large Videos, and Old Media
+2. **Review Results**: See potential space savings and item counts for each category
+3. **Select Items**: Choose specific cleanup groups or use "Select All"
 4. **Delete**: Tap "Delete Selected" to remove chosen items
 5. **Confirm**: Review the deletion summary
 
@@ -211,6 +269,26 @@ fun NavGraphBuilder.smartCleanerNavigation(navController: NavHostController) {
 
 ## 🚀 **Performance & Architecture Improvements**
 
+### **✅ Sealed Interface Design**
+- **Type Safety**: Using sealed interface with `data object` for better type safety
+- **Pattern Matching**: Efficient `when` expressions with `is` checks
+- **Extensibility**: Easy to add new categories in the future
+
+### **✅ Generalized Methods**
+- **Code Reuse**: Single implementation for all categories
+- **Maintainability**: Less code duplication
+- **Consistency**: Uniform behavior across all categories
+
+### **✅ Optimized UI Updates**
+- **Atomic Updates**: Single state update for all categories
+- **Smart Filtering**: Intelligent item removal with minimum thresholds
+- **Performance**: Reduced recomposition overhead
+
+### **✅ Clean Code**
+- **Removed Unused Code**: Eliminated legacy methods and unused state flows
+- **Simplified Callbacks**: Streamlined deletion result handling
+- **Better Organization**: Clear separation of concerns
+
 ### **✅ MediaManager Integration**
 - **Eliminated Code Duplication**: Single source of truth for media loading
 - **Proper Dependency Utilization**: MediaManager is fully utilized
@@ -237,11 +315,12 @@ fun NavGraphBuilder.smartCleanerNavigation(navController: NavHostController) {
 ### **Before vs After**
 | Aspect | Before | After |
 |--------|--------|-------|
-| **Media Loading** | Duplicated queries | Single cached query |
-| **Flow Handling** | Multiple collect operations | Single combine operation |
-| **Parameters** | Hardcoded values | Configurable with defaults |
-| **Memory Usage** | High (multiple queries) | Low (cached data) |
-| **Code Duplication** | High | Eliminated |
+| **Code Duplication** | High (legacy methods) | Eliminated |
+| **State Management** | Multiple updates | Single atomic update |
+| **Type Safety** | Enum-based | Sealed interface |
+| **UI Updates** | Inefficient | Smart filtering |
+| **Memory Usage** | High (unused flows) | Optimized |
+| **Maintainability** | Complex | Simplified |
 
 ## 🚀 Future Enhancements
 
@@ -260,4 +339,4 @@ fun NavGraphBuilder.smartCleanerNavigation(navController: NavHostController) {
 
 ---
 
-**Smart Cleaner** transforms the way users manage their media storage, providing an intelligent, safe, and efficient way to reclaim valuable device space while maintaining a beautiful and intuitive user experience. The implementation follows clean architecture principles with proper MediaManager integration, configurable parameters, and efficient flow handling for optimal performance. 
+**Smart Cleaner** transforms the way users manage their media storage, providing an intelligent, safe, and efficient way to reclaim valuable device space while maintaining a beautiful and intuitive user experience. The implementation follows clean architecture principles with proper MediaManager integration, sealed interface design, generalized methods, and optimized UI updates for optimal performance. 
