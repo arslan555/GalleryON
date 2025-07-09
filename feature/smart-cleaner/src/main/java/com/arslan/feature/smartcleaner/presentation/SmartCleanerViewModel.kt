@@ -1,21 +1,25 @@
 package com.arslan.feature.smartcleaner.presentation
 
+import android.os.Build
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.arslan.domain.model.cleaner.CleanupItem
 import com.arslan.domain.usecase.cleaner.DeleteMediaItemsUseCase
 import com.arslan.domain.usecase.cleaner.FindDuplicateImagesUseCase
+import com.arslan.data.cleaner.MediaDeletionHelper
 import com.arslan.domain.usecase.cleaner.FindLargeVideosUseCase
 import com.arslan.domain.usecase.cleaner.FindOldMediaUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
+
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+
 
 @HiltViewModel
 class SmartCleanerViewModel @Inject constructor(
@@ -23,186 +27,204 @@ class SmartCleanerViewModel @Inject constructor(
     private val findLargeVideosUseCase: FindLargeVideosUseCase,
     private val findOldMediaUseCase: FindOldMediaUseCase,
     private val deleteMediaItemsUseCase: DeleteMediaItemsUseCase
-) : ViewModel() {
+) : ViewModel(), MediaDeletionHelper.DeletionCallback {
 
-    private val _state = MutableStateFlow<SmartCleanerState>(SmartCleanerState.Loading)
-    val state: StateFlow<SmartCleanerState> = _state.asStateFlow()
+    private val _screenState = MutableStateFlow(SmartCleanerScreenState())
+    val screenState: StateFlow<SmartCleanerScreenState> = _screenState.asStateFlow()
 
-    private val _selectedItems = MutableStateFlow<Set<String>>(emptySet())
-    
-    // Track current active filter
-    private val _currentFilter = MutableStateFlow<CleanupFilter>(CleanupFilter.All)
-    val currentFilter: StateFlow<CleanupFilter> = _currentFilter.asStateFlow()
+    // Generalized selection state management
+    private val _selectedItems = MutableStateFlow<Map<CleanerCategory, Set<String>>>(emptyMap())
+    val selectedItems: StateFlow<Map<CleanerCategory, Set<String>>> = _selectedItems.asStateFlow()
+
+
+
+    // Track the last deleted items for callback handling
+    private var lastDeletedItems: List<Long> = emptyList()
 
     init {
-        loadAllCleanupItems()
+        loadAllCategories()
+        // Set up the deletion callback
+        MediaDeletionHelper.setDeletionCallback(this)
     }
 
+    private fun loadAllCategories() {
+        // Duplicates
+        viewModelScope.launch {
+            _screenState.update { it.copy(duplicates = CleanerCategoryState(isLoading = true, error = null)) }
+            try {
+                val items = findDuplicateImagesUseCase().firstOrNull() ?: emptyList()
+                _screenState.update { it.copy(duplicates = CleanerCategoryState(isLoading = false, items = items)) }
+            } catch (e: Exception) {
+                _screenState.update { it.copy(duplicates = CleanerCategoryState(isLoading = false, error = e.message ?: "Failed to load duplicates")) }
+            }
+        }
+        // Large Media
+        viewModelScope.launch {
+            _screenState.update { it.copy(largeMedia = CleanerCategoryState(isLoading = true, error = null)) }
+            try {
+                val items = findLargeVideosUseCase(100).firstOrNull() ?: emptyList()
+                _screenState.update { it.copy(largeMedia = CleanerCategoryState(isLoading = false, items = items)) }
+            } catch (e: Exception) {
+                _screenState.update { it.copy(largeMedia = CleanerCategoryState(isLoading = false, error = e.message ?: "Failed to load large videos")) }
+            }
+        }
+        // Old Media
+        viewModelScope.launch {
+            _screenState.update { it.copy(oldMedia = CleanerCategoryState(isLoading = true, error = null)) }
+            try {
+                val items = findOldMediaUseCase(365).firstOrNull() ?: emptyList()
+                _screenState.update { it.copy(oldMedia = CleanerCategoryState(isLoading = false, items = items)) }
+            } catch (e: Exception) {
+                _screenState.update { it.copy(oldMedia = CleanerCategoryState(isLoading = false, error = e.message ?: "Failed to load old media")) }
+            }
+        }
+    }
+
+    // Generalized selection management
+    fun toggleSelection(category: CleanerCategory, itemId: String, selected: Boolean) {
+        _selectedItems.update { currentMap ->
+            val currentSet = currentMap[category] ?: emptySet()
+            val newSet = if (selected) {
+                currentSet + itemId
+            } else {
+                currentSet - itemId
+            }
+            currentMap + (category to newSet)
+        }
+    }
+
+    fun selectAll(category: CleanerCategory, items: List<CleanupItem>) {
+        _selectedItems.update { currentMap ->
+            currentMap + (category to items.map { it.id }.toSet())
+        }
+    }
+
+    fun clearAll(category: CleanerCategory) {
+        _selectedItems.update { currentMap ->
+            currentMap + (category to emptySet())
+        }
+    }
+
+    // Generalized deletion method
+    fun deleteSelected(category: CleanerCategory) {
+        val selectedIds = _selectedItems.value[category] ?: emptySet()
+        val items = when (category) {
+            is CleanerCategory.Duplicates -> {
+                val duplicateGroups = _screenState.value.duplicates.items
+                    .filter { selectedIds.contains(it.id) }
+                duplicateGroups.flatMap { it.mediaItems.drop(1).map { media -> media.id } }
+            }
+            is CleanerCategory.LargeVideos -> {
+                _screenState.value.largeMedia.items
+                    .filter { selectedIds.contains(it.id) }
+                    .flatMap { it.mediaItems }
+                    .map { it.id }
+            }
+            is CleanerCategory.OldMedia -> {
+                _screenState.value.oldMedia.items
+                    .filter { selectedIds.contains(it.id) }
+                    .flatMap { it.mediaItems }
+                    .map { it.id }
+            }
+        }
+
+        if (items.isEmpty()) return
+
+        viewModelScope.launch {
+            lastDeletedItems = items
+            deleteMediaItemsUseCase(items)
+                .onSuccess {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                        clearAll(category)
+                    } else {
+                        updateUIAfterDeletion(items)
+                        clearAll(category)
+                    }
+                }
+                .onFailure { /* handle error */ }
+        }
+    }
+
+
+
+    // --- Event handler for category reloads ---
     fun onEvent(event: SmartCleanerEvent) {
         when (event) {
-            SmartCleanerEvent.Refresh -> {
-                loadAllCleanupItems()
-            }
-
-            is SmartCleanerEvent.ItemSelected -> {
-                val currentSelected = _selectedItems.value.toMutableSet()
-                if (event.selected) {
-                    currentSelected.add(event.itemId)
-                } else {
-                    currentSelected.remove(event.itemId)
-                }
-                _selectedItems.value = currentSelected
-                updateStateWithSelection()
-            }
-
-            SmartCleanerEvent.SelectAll -> {
-                val currentState = _state.value
-                if (currentState is SmartCleanerState.Success) {
-                    _selectedItems.value = currentState.cleanupItems.map { it.id }.toSet()
-                    updateStateWithSelection()
-                }
-            }
-            
-            SmartCleanerEvent.DeselectAll -> {
-                _selectedItems.value = emptySet()
-                updateStateWithSelection()
-            }
-
-            SmartCleanerEvent.DeleteSelected -> {
-                deleteSelectedItems()
-            }
-
+            SmartCleanerEvent.Refresh -> loadAllCategories()
             SmartCleanerEvent.ScanForDuplicates -> {
-                _currentFilter.value = CleanupFilter.Duplicates
-                scanForDuplicates()
+                viewModelScope.launch {
+                    _screenState.update { it.copy(duplicates = CleanerCategoryState(isLoading = true, error = null)) }
+                    try {
+                        val items = findDuplicateImagesUseCase().firstOrNull() ?: emptyList()
+                        _screenState.update { it.copy(duplicates = CleanerCategoryState(isLoading = false, items = items)) }
+                    } catch (e: Exception) {
+                        _screenState.update { it.copy(duplicates = CleanerCategoryState(isLoading = false, error = e.message ?: "Failed to load duplicates")) }
+                    }
+                }
             }
-
             SmartCleanerEvent.ScanForLargeVideos -> {
-                _currentFilter.value = CleanupFilter.LargeVideos
-                scanForLargeVideos()
+                viewModelScope.launch {
+                    _screenState.update { it.copy(largeMedia = CleanerCategoryState(isLoading = true, error = null)) }
+                    try {
+                        val items = findLargeVideosUseCase(100).firstOrNull() ?: emptyList()
+                        _screenState.update { it.copy(largeMedia = CleanerCategoryState(isLoading = false, items = items)) }
+                    } catch (e: Exception) {
+                        _screenState.update { it.copy(largeMedia = CleanerCategoryState(isLoading = false, error = e.message ?: "Failed to load large videos")) }
+                    }
+                }
             }
-
             SmartCleanerEvent.ScanForOldMedia -> {
-                _currentFilter.value = CleanupFilter.OldMedia
-                scanForOldMedia()
+                viewModelScope.launch {
+                    _screenState.update { it.copy(oldMedia = CleanerCategoryState(isLoading = true, error = null)) }
+                    try {
+                        val items = findOldMediaUseCase(365).firstOrNull() ?: emptyList()
+                        _screenState.update { it.copy(oldMedia = CleanerCategoryState(isLoading = false, items = items)) }
+                    } catch (e: Exception) {
+                        _screenState.update { it.copy(oldMedia = CleanerCategoryState(isLoading = false, error = e.message ?: "Failed to load old media")) }
+                    }
+                }
             }
         }
     }
 
-    private fun loadAllCleanupItems() {
-        viewModelScope.launch(Dispatchers.IO) {
-            _currentFilter.value = CleanupFilter.All
-            combine(
-                findDuplicateImagesUseCase(),
-                findLargeVideosUseCase(100), // 100MB threshold
-                findOldMediaUseCase(365) // 1 year old
-            ) { duplicates, largeVideos, oldMedia ->
-                duplicates + largeVideos + oldMedia
+    // --- Callback ---
+    override fun onDeletionResult(success: Boolean, message: String) {
+        if (success) {
+            updateUIAfterDeletion(lastDeletedItems)
+        }
+    }
+
+    // --- UI Update ---
+    private fun updateUIAfterDeletion(deletedItemIds: List<Long>) {
+        viewModelScope.launch {
+            // Helper function to update cleanup items
+            fun updateCleanupItems(items: List<CleanupItem>, minRemainingItems: Int = 1): List<CleanupItem> {
+                return items.mapNotNull { cleanupItem ->
+                    val remainingItems = cleanupItem.mediaItems.filter { it.id !in deletedItemIds }
+                    if (remainingItems.size >= minRemainingItems) {
+                        cleanupItem.copy(
+                            mediaItems = remainingItems,
+                            itemCount = remainingItems.size,
+                            totalSize = remainingItems.sumOf { it.size ?: 0 }
+                        )
+                    } else null
+                }
             }
-            .onStart {
-                _state.value = SmartCleanerState.Loading
-            }
-            .catch { exception ->
-                _state.value = SmartCleanerState.Error(exception.message ?: "Unknown error")
-            }
-            .collect { cleanupItems ->
-                val totalSpaceSaved = cleanupItems.sumOf { it.totalSize }
-                _state.value = SmartCleanerState.Success(
-                    cleanupItems = cleanupItems,
-                    totalSpaceSaved = totalSpaceSaved,
-                    selectedItems = _selectedItems.value
+
+            // Update all categories in a single state update
+            _screenState.update { currentState ->
+                currentState.copy(
+                    duplicates = currentState.duplicates.copy(
+                        items = updateCleanupItems(currentState.duplicates.items, minRemainingItems = 2)
+                    ),
+                    largeMedia = currentState.largeMedia.copy(
+                        items = updateCleanupItems(currentState.largeMedia.items)
+                    ),
+                    oldMedia = currentState.oldMedia.copy(
+                        items = updateCleanupItems(currentState.oldMedia.items)
+                    )
                 )
             }
-        }
-    }
-
-    private fun updateStateWithSelection() {
-        val currentState = _state.value
-        if (currentState is SmartCleanerState.Success) {
-            _state.value = currentState.copy(selectedItems = _selectedItems.value)
-        }
-    }
-
-    private fun deleteSelectedItems() {
-        val currentState = _state.value
-        if (currentState !is SmartCleanerState.Success) return
-
-        val selectedCleanupItems = currentState.cleanupItems.filter { it.id in _selectedItems.value }
-        val allMediaIds = selectedCleanupItems.flatMap { it.mediaItems.map { media -> media.id } }
-
-        viewModelScope.launch(Dispatchers.IO) {
-            _state.value = SmartCleanerState.Deleting
-
-            deleteMediaItemsUseCase(allMediaIds)
-                .onSuccess {
-                    _state.value = SmartCleanerState.DeletionComplete(allMediaIds.size)
-                    _selectedItems.value = emptySet()
-                    // Reload the list after deletion
-                    loadAllCleanupItems()
-                }
-                .onFailure { exception ->
-                    _state.value = SmartCleanerState.Error(exception.message ?: "Failed to delete items")
-                }
-        }
-    }
-
-    private fun scanForDuplicates() {
-        viewModelScope.launch(Dispatchers.IO) {
-            findDuplicateImagesUseCase()
-                .onStart {
-                    _state.value = SmartCleanerState.Loading
-                }
-                .catch { exception ->
-                    _state.value = SmartCleanerState.Error(exception.message ?: "Failed to scan for duplicates")
-                }
-                .collect { duplicates ->
-                    val totalSpaceSaved = duplicates.sumOf { it.totalSize }
-                    _state.value = SmartCleanerState.Success(
-                        cleanupItems = duplicates,
-                        totalSpaceSaved = totalSpaceSaved,
-                        selectedItems = _selectedItems.value
-                    )
-                }
-        }
-    }
-
-    private fun scanForLargeVideos() {
-        viewModelScope.launch(Dispatchers.IO) {
-            findLargeVideosUseCase(100) // 100MB threshold
-                .onStart {
-                    _state.value = SmartCleanerState.Loading
-                }
-                .catch { exception ->
-                    _state.value = SmartCleanerState.Error(exception.message ?: "Failed to scan for large videos")
-                }
-                .collect { largeVideos ->
-                    val totalSpaceSaved = largeVideos.sumOf { it.totalSize }
-                    _state.value = SmartCleanerState.Success(
-                        cleanupItems = largeVideos,
-                        totalSpaceSaved = totalSpaceSaved,
-                        selectedItems = _selectedItems.value
-                    )
-                }
-        }
-    }
-
-    private fun scanForOldMedia() {
-        viewModelScope.launch(Dispatchers.IO) {
-            findOldMediaUseCase(365) // 1 year old
-                .onStart {
-                    _state.value = SmartCleanerState.Loading
-                }
-                .catch { exception ->
-                    _state.value = SmartCleanerState.Error(exception.message ?: "Failed to scan for old media")
-                }
-                .collect { oldMedia ->
-                    val totalSpaceSaved = oldMedia.sumOf { it.totalSize }
-                    _state.value = SmartCleanerState.Success(
-                        cleanupItems = oldMedia,
-                        totalSpaceSaved = totalSpaceSaved,
-                        selectedItems = _selectedItems.value
-                    )
-                }
         }
     }
 } 

@@ -2,21 +2,14 @@ package com.arslan.feature.smartcleaner.presentation
 
 import com.arslan.domain.model.cleaner.CleanupItem
 
-sealed interface SmartCleanerState {
-    data object Loading : SmartCleanerState
-    data class Success(
-        val cleanupItems: List<CleanupItem>,
-        val totalSpaceSaved: Long,
-        val selectedItems: Set<String> = emptySet()
-    ) : SmartCleanerState
-    data class Error(val message: String) : SmartCleanerState
-    data object Deleting : SmartCleanerState
-    data class DeletionComplete(val deletedCount: Int) : SmartCleanerState
-}
+data class CleanerCategoryState(
+    val isLoading: Boolean = false,
+    val items: List<CleanupItem> = emptyList(),
+    val error: String? = null
+)
 
-sealed class CleanupFilter {
-    data object All : CleanupFilter()
-    data object Duplicates : CleanupFilter()
-    data object LargeVideos : CleanupFilter()
-    data object OldMedia : CleanupFilter()
-} 
+data class SmartCleanerScreenState(
+    val duplicates: CleanerCategoryState = CleanerCategoryState(isLoading = true),
+    val largeMedia: CleanerCategoryState = CleanerCategoryState(isLoading = true),
+    val oldMedia: CleanerCategoryState = CleanerCategoryState(isLoading = true)
+) 

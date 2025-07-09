@@ -21,7 +21,8 @@ class MediaManager @Inject constructor(
     val allMediaItems = _allMediaItems.asStateFlow()
 
     suspend fun loadAllMedia() = withContext(Dispatchers.IO) {
-        if (_allMediaItems.value.isNotEmpty()) return@withContext // Already loaded
+        // Always reload to ensure we have the latest data
+        android.util.Log.d("MediaManager", "Loading all media from OS...")
 
         val mediaItems = mutableListOf<MediaItem>()
 
@@ -128,6 +129,44 @@ class MediaManager @Inject constructor(
      */
     fun clearCache() {
         _allMediaItems.value = emptyList()
+    }
+
+    /**
+     * Remove specific media items from cache (for immediate UI update after deletion)
+     */
+    fun removeFromCache(mediaIds: List<Long>) {
+        val currentItems = _allMediaItems.value.toMutableList()
+        currentItems.removeAll { it.id in mediaIds }
+        _allMediaItems.value = currentItems
+        android.util.Log.d("MediaManager", "Removed ${mediaIds.size} items from cache. Remaining: ${_allMediaItems.value.size}")
+    }
+
+    /**
+     * Force reload all media from OS (for background sync)
+     */
+    private suspend fun forceReload() = withContext(Dispatchers.IO) {
+        _allMediaItems.value = emptyList() // Clear first
+        loadAllMedia() // Reload from OS
+    }
+
+    /**
+     * Smart refresh: immediate cache update + background OS sync
+     */
+    suspend fun smartRefresh(deletedMediaIds: List<Long>) = withContext(Dispatchers.IO) {
+        android.util.Log.d("MediaManager", "Starting smart refresh for ${deletedMediaIds.size} items")
+        
+        // Step 1: Immediate cache update for fast UI response
+        removeFromCache(deletedMediaIds)
+        
+        // Step 2: Force reload to ensure cache is updated with latest data
+        // This is important for duplicate detection to work correctly
+        try {
+            forceReload()
+            android.util.Log.d("MediaManager", "Smart refresh completed successfully")
+        } catch (e: Exception) {
+            android.util.Log.e("MediaManager", "Smart refresh failed: ${e.message}", e)
+            throw e
+        }
     }
 
     private fun Cursor.getLongOrNull(columnIndex: Int): Long? {

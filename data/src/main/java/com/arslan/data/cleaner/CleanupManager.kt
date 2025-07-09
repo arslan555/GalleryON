@@ -3,7 +3,6 @@ package com.arslan.data.cleaner
 import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
-import android.provider.MediaStore
 import com.arslan.data.media.MediaManager
 import com.arslan.domain.model.cleaner.CleanupItem
 import com.arslan.domain.model.cleaner.CleanupType
@@ -22,13 +21,17 @@ import javax.inject.Singleton
 @Singleton
 class CleanupManager @Inject constructor(
     context: Context,
-    private val mediaManager: MediaManager
+    private val mediaManager: MediaManager,
+    private val mediaDeletionHelper: MediaDeletionHelper
 ) {
     private val contentResolver: ContentResolver = context.contentResolver
 
     fun findDuplicateImages(): Flow<List<CleanupItem>> = flow {
+        android.util.Log.d("CleanupManager", "Finding duplicate images...")
         val images = mediaManager.getImages()
+        android.util.Log.d("CleanupManager", "Found ${images.size} images to check for duplicates")
         val duplicates = findDuplicatesByHash(images)
+        android.util.Log.d("CleanupManager", "Found ${duplicates.size} duplicate groups")
         emit(duplicates)
     }.flowOn(Dispatchers.IO)
 
@@ -92,18 +95,23 @@ class CleanupManager @Inject constructor(
 
     suspend fun deleteMediaItems(mediaItemIds: List<Long>): Result<Unit> = withContext(Dispatchers.IO) {
         try {
-            mediaItemIds.forEach { id ->
-                val uri = Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id.toString())
-                contentResolver.delete(uri, null, null)
+            // Use the MediaDeletionHelper for proper deletion across Android versions
+            val result = mediaDeletionHelper.deleteMediaItems(mediaItemIds)
+            
+            // Remove deleted items from cache on successful deletion
+            if (result.isSuccess) {
+                mediaManager.removeFromCache(mediaItemIds)
             }
-            // Clear cache and reload media list after deletion
-            mediaManager.clearCache()
-            mediaManager.loadAllMedia()
-            Result.success(Unit)
+            
+            result
         } catch (e: Exception) {
+            println("CleanupManager: Exception during deletion: ${e.message}")
+            e.printStackTrace()
             Result.failure(e)
         }
     }
+
+
 
     private suspend fun findDuplicatesByHash(images: List<MediaItem>): List<CleanupItem> = withContext(Dispatchers.IO) {
         val hashGroups = mutableMapOf<String, MutableList<MediaItem>>()

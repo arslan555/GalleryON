@@ -19,6 +19,8 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -57,8 +59,10 @@ class SmartCleanerViewModelTest {
 
     @Test
     fun `initial state should be loading`() = runTest {
-        val initialState = viewModel.state.value
-        assertTrue(initialState is SmartCleanerState.Loading)
+        val initialState = viewModel.screenState.value
+        assertTrue(initialState.duplicates.isLoading)
+        assertTrue(initialState.largeMedia.isLoading)
+        assertTrue(initialState.oldMedia.isLoading)
     }
 
     @Test
@@ -77,58 +81,76 @@ class SmartCleanerViewModelTest {
         testDispatcher.scheduler.advanceUntilIdle()
         
         // Then
-        val state = viewModel.state.value
-        assertTrue(state is SmartCleanerState.Success)
-        assertEquals(2, (state as SmartCleanerState.Success).cleanupItems.size)
-        assertEquals(51 * 1024 * 1024L, state.totalSpaceSaved)
+        val state = viewModel.screenState.value
+        assertEquals(1, state.duplicates.items.size)
+        assertEquals(1, state.largeMedia.items.size)
+        assertEquals(0, state.oldMedia.items.size)
+        assertFalse(state.duplicates.isLoading)
+        assertFalse(state.largeMedia.isLoading)
+        assertFalse(state.oldMedia.isLoading)
     }
 
     @Test
-    fun `should handle item selection correctly`() = runTest {
-        // Given
-        val mockCleanupItems = listOf(
-            createMockCleanupItem("duplicate1", CleanupType.Duplicates("hash1"), 1024 * 1024L, 2)
+    fun `toggleSelection adds and removes items correctly`() = runTest {
+        // Test adding selection
+        viewModel.toggleSelection(CleanerCategory.Duplicates, "duplicate1", true)
+        assertEquals(setOf("duplicate1"), viewModel.selectedItems.value[CleanerCategory.Duplicates])
+        
+        // Test adding another selection
+        viewModel.toggleSelection(CleanerCategory.Duplicates, "duplicate2", true)
+        assertEquals(setOf("duplicate1", "duplicate2"), viewModel.selectedItems.value[CleanerCategory.Duplicates])
+        
+        // Test removing selection
+        viewModel.toggleSelection(CleanerCategory.Duplicates, "duplicate1", false)
+        assertEquals(setOf("duplicate2"), viewModel.selectedItems.value[CleanerCategory.Duplicates])
+    }
+
+    @Test
+    fun `selectAll selects all items`() = runTest {
+        val items = listOf(
+            CleanupItem("1", emptyList(), CleanupType.Duplicates("hash1"), 1024L, 1),
+            CleanupItem("2", emptyList(), CleanupType.Duplicates("hash2"), 2048L, 1)
         )
         
-        coEvery { findDuplicateImagesUseCase() } returns flowOf(mockCleanupItems)
+        viewModel.selectAll(CleanerCategory.Duplicates, items)
+        assertEquals(setOf("1", "2"), viewModel.selectedItems.value[CleanerCategory.Duplicates])
+    }
+
+    @Test
+    fun `should handle errors when loading cleanup items fails`() = runTest {
+        // Given
+        val errorMessage = "Failed to load duplicates"
+        coEvery { findDuplicateImagesUseCase() } throws Exception(errorMessage)
         coEvery { findLargeVideosUseCase(100) } returns flowOf(emptyList())
         coEvery { findOldMediaUseCase(365) } returns flowOf(emptyList())
         
-        testDispatcher.scheduler.advanceUntilIdle()
-        
         // When
-        viewModel.onEvent(SmartCleanerEvent.ItemSelected("duplicate1", true))
         testDispatcher.scheduler.advanceUntilIdle()
         
         // Then
-        val state = viewModel.state.value
-        assertTrue(state is SmartCleanerState.Success)
-        assertEquals(1, (state as SmartCleanerState.Success).selectedItems.size)
-        assertTrue(state.selectedItems.contains("duplicate1"))
+        val state = viewModel.screenState.value
+        assertEquals(errorMessage, state.duplicates.error)
+        assertFalse(state.duplicates.isLoading)
+        assertTrue(state.duplicates.items.isEmpty())
     }
 
     @Test
-    fun `should handle select all correctly`() = runTest {
-        // Given
-        val mockCleanupItems = listOf(
-            createMockCleanupItem("duplicate1", CleanupType.Duplicates("hash1"), 1024 * 1024L, 2),
-            createMockCleanupItem("large_video1", CleanupType.LargeVideos(100), 50 * 1024 * 1024L, 1)
-        )
-        
-        coEvery { findDuplicateImagesUseCase() } returns flowOf(listOf(mockCleanupItems[0]))
-        coEvery { findLargeVideosUseCase(100) } returns flowOf(listOf(mockCleanupItems[1]))
-        coEvery { findOldMediaUseCase(365) } returns flowOf(emptyList())
-        
+    fun `should clear error when retrying after failure`() = runTest {
+        // Given - First attempt fails
+        coEvery { findDuplicateImagesUseCase() } throws Exception("Initial error")
         testDispatcher.scheduler.advanceUntilIdle()
         
-        // When
-        viewModel.onEvent(SmartCleanerEvent.SelectAll)
+        // Verify error state
+        assertEquals("Initial error", viewModel.screenState.value.duplicates.error)
+        
+        // When - Retry succeeds
+        coEvery { findDuplicateImagesUseCase() } returns flowOf(emptyList())
+        viewModel.onEvent(SmartCleanerEvent.ScanForDuplicates)
         testDispatcher.scheduler.advanceUntilIdle()
         
-        // Then
-        val state = viewModel.state.value
-        assertTrue(state is SmartCleanerState.Success)
-        assertEquals(2, (state as SmartCleanerState.Success).selectedItems.size)
+        // Then - Error should be cleared
+        assertNull(viewModel.screenState.value.duplicates.error)
+        assertFalse(viewModel.screenState.value.duplicates.isLoading)
     }
 
     private fun createMockCleanupItem(
