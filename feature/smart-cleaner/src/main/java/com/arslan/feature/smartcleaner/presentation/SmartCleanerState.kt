@@ -5,7 +5,8 @@ import com.arslan.domain.model.cleaner.CleanupItem
 data class CleanerCategoryState(
     val isLoading: Boolean = false,
     val items: List<CleanupItem> = emptyList(),
-    val error: String? = null
+    val error: String? = null,
+    val isDeleting: Boolean = false
 )
 
 data class SmartCleanerScreenState(

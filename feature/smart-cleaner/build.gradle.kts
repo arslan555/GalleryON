@@ -59,6 +59,7 @@ dependencies {
     // Compose dependencies
     implementation(libs.compose.ui)
     implementation(libs.compose.material3)
+    implementation(libs.androidx.material3.android)
     implementation(libs.compose.runtime)
     implementation(libs.compose.ui.tooling)
     implementation(libs.compose.ui.preview)
@@ -71,6 +72,10 @@ dependencies {
 
     // Coroutines
     implementation(libs.coroutines.android)
+
+    //coil
+    implementation(libs.coil.kt)
+    implementation(libs.coil.kt.compose)
 
     // Unit Testing
     testImplementation(libs.junit)

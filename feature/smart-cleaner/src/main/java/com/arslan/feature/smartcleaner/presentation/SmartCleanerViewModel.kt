@@ -7,6 +7,7 @@ import com.arslan.domain.model.cleaner.CleanupItem
 import com.arslan.domain.usecase.cleaner.DeleteMediaItemsUseCase
 import com.arslan.domain.usecase.cleaner.FindDuplicateImagesUseCase
 import com.arslan.data.cleaner.MediaDeletionHelper
+import com.arslan.domain.model.cleaner.CleanupType
 import com.arslan.domain.usecase.cleaner.FindLargeVideosUseCase
 import com.arslan.domain.usecase.cleaner.FindOldMediaUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -48,7 +49,7 @@ class SmartCleanerViewModel @Inject constructor(
     }
 
     private fun loadAllCategories() {
-        // Duplicates
+        // Duplicates (grouped as before)
         viewModelScope.launch {
             _screenState.update { it.copy(duplicates = CleanerCategoryState(isLoading = true, error = null)) }
             try {
@@ -58,22 +59,44 @@ class SmartCleanerViewModel @Inject constructor(
                 _screenState.update { it.copy(duplicates = CleanerCategoryState(isLoading = false, error = e.message ?: "Failed to load duplicates")) }
             }
         }
-        // Large Media
+        // Large Media (split into individual CleanupItems)
         viewModelScope.launch {
             _screenState.update { it.copy(largeMedia = CleanerCategoryState(isLoading = true, error = null)) }
             try {
                 val items = findLargeVideosUseCase(100).firstOrNull() ?: emptyList()
-                _screenState.update { it.copy(largeMedia = CleanerCategoryState(isLoading = false, items = items)) }
+                val splitItems = items.flatMap { group ->
+                    group.mediaItems.map { media ->
+                        CleanupItem(
+                            id = media.id.toString(),
+                            mediaItems = listOf(media),
+                            cleanupType = CleanupType.LargeVideos(100),
+                            totalSize = media.size ?: 0L,
+                            itemCount = 1
+                        )
+                    }
+                }
+                _screenState.update { it.copy(largeMedia = CleanerCategoryState(isLoading = false, items = splitItems)) }
             } catch (e: Exception) {
                 _screenState.update { it.copy(largeMedia = CleanerCategoryState(isLoading = false, error = e.message ?: "Failed to load large videos")) }
             }
         }
-        // Old Media
+        // Old Media (split into individual CleanupItems)
         viewModelScope.launch {
             _screenState.update { it.copy(oldMedia = CleanerCategoryState(isLoading = true, error = null)) }
             try {
                 val items = findOldMediaUseCase(365).firstOrNull() ?: emptyList()
-                _screenState.update { it.copy(oldMedia = CleanerCategoryState(isLoading = false, items = items)) }
+                val splitItems = items.flatMap { group ->
+                    group.mediaItems.map { media ->
+                        CleanupItem(
+                            id = media.id.toString(),
+                            mediaItems = listOf(media),
+                            cleanupType = CleanupType.OldMedia(365),
+                            totalSize = media.size ?: 0L,
+                            itemCount = 1
+                        )
+                    }
+                }
+                _screenState.update { it.copy(oldMedia = CleanerCategoryState(isLoading = false, items = splitItems)) }
             } catch (e: Exception) {
                 _screenState.update { it.copy(oldMedia = CleanerCategoryState(isLoading = false, error = e.message ?: "Failed to load old media")) }
             }
@@ -130,6 +153,8 @@ class SmartCleanerViewModel @Inject constructor(
 
         if (items.isEmpty()) return
 
+        // Set isDeleting
+        setCategoryDeleting(category, true)
         viewModelScope.launch {
             lastDeletedItems = items
             deleteMediaItemsUseCase(items)
@@ -142,6 +167,8 @@ class SmartCleanerViewModel @Inject constructor(
                     }
                 }
                 .onFailure { /* handle error */ }
+            // Reset isDeleting
+            setCategoryDeleting(category, false)
         }
     }
 
@@ -224,6 +251,16 @@ class SmartCleanerViewModel @Inject constructor(
                         items = updateCleanupItems(currentState.oldMedia.items)
                     )
                 )
+            }
+        }
+    }
+
+    private fun setCategoryDeleting(category: CleanerCategory, isDeleting: Boolean) {
+        _screenState.update { state ->
+            when (category) {
+                is CleanerCategory.Duplicates -> state.copy(duplicates = state.duplicates.copy(isDeleting = isDeleting))
+                is CleanerCategory.LargeVideos -> state.copy(largeMedia = state.largeMedia.copy(isDeleting = isDeleting))
+                is CleanerCategory.OldMedia -> state.copy(oldMedia = state.oldMedia.copy(isDeleting = isDeleting))
             }
         }
     }

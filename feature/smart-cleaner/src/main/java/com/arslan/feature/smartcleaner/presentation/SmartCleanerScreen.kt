@@ -1,5 +1,7 @@
 package com.arslan.feature.smartcleaner.presentation
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,13 +15,17 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.Group
+import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.VideoLibrary
+import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -43,18 +49,25 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.rememberAsyncImagePainter
 import com.arslan.core.utils.FileUtils.formatSize
+import com.arslan.core.utils.FileUtils.readableFileSize
+import com.arslan.core.utils.formatDate
 import com.arslan.domain.model.cleaner.CleanupItem
 import com.arslan.domain.model.cleaner.CleanupType
 import com.arslan.domain.model.media.MediaItem
 import com.arslan.domain.model.media.MediaType
-
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -255,6 +268,98 @@ fun CategoryChips(
 }
 
 @Composable
+fun MediaCleanupCard(
+    mediaItem: MediaItem,
+    isSelected: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    extraInfo: String? = null
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 2.dp),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+    ) {
+        Row(
+            modifier = Modifier.padding(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(modifier = Modifier.size(72.dp)) {
+                Image(
+                    painter = rememberAsyncImagePainter(model = mediaItem.uri),
+                    contentDescription = mediaItem.name,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clip(RoundedCornerShape(12.dp))
+                )
+                // Media type icon overlay
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .background(
+                            brush = Brush.horizontalGradient(
+                                colors = listOf(Color.Black.copy(alpha = 0.7f), Color.Transparent)
+                            ),
+                            shape = RoundedCornerShape(bottomEnd = 8.dp)
+                        )
+                        .padding(4.dp)
+                ) {
+                    Icon(
+                        imageVector = when (mediaItem.mediaType) {
+                            MediaType.Image -> Icons.Default.Image
+                            MediaType.Video -> Icons.Default.Videocam
+                        },
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
+                // Checkbox overlay
+                Checkbox(
+                    checked = isSelected,
+                    onCheckedChange = onCheckedChange,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(2.dp)
+                )
+            }
+            Spacer(Modifier.width(12.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = mediaItem.name,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.SemiBold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = mediaItem.size?.let { readableFileSize(it) } ?: "-",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    Text(
+                        text = mediaItem.dateTaken?.formatDate("yyyy-MM-dd") ?: "",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+                if (extraInfo != null) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.Group, contentDescription = null, modifier = Modifier.size(16.dp), tint = MaterialTheme.colorScheme.primary)
+                        Spacer(Modifier.width(4.dp))
+                        Text(extraInfo, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
 fun CategoryContent(
     title: String,
     state: CleanerCategoryState,
@@ -267,42 +372,40 @@ fun CategoryContent(
 ) {
     Text(
         text = title,
-        style = MaterialTheme.typography.headlineSmall,
+        style = MaterialTheme.typography.titleLarge,
         fontWeight = FontWeight.Bold,
-        modifier = Modifier.padding(bottom = 16.dp)
+        modifier = Modifier.padding(vertical = 8.dp)
     )
-
-    // Selection and delete buttons row
+    // Bulk actions row (text buttons, minimalist)
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         OutlinedButton(
             onClick = onSelectAll,
-            enabled = state.items.isNotEmpty() && state.error == null,
-            modifier = Modifier.weight(1f)
+            enabled = state.items.isNotEmpty() && state.error == null && !state.isDeleting
         ) {
             Text("Select All")
         }
         OutlinedButton(
             onClick = onClearAll,
-            enabled = selectedItems.isNotEmpty() && state.error == null,
-            modifier = Modifier.weight(1f)
+            enabled = selectedItems.isNotEmpty() && state.error == null && !state.isDeleting
         ) {
             Text("Clear All")
         }
         Button(
             onClick = onDeleteSelected,
-            enabled = selectedItems.isNotEmpty() && state.error == null,
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
-            modifier = Modifier.weight(1f)
+            enabled = selectedItems.isNotEmpty() && state.error == null && !state.isDeleting,
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
         ) {
-            Text("Delete (${selectedItems.size})")
+            if (state.isDeleting) {
+                CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
+            } else {
+                Text("Delete")
+            }
         }
     }
-
-    Spacer(modifier = Modifier.height(16.dp))
-
+    Spacer(modifier = Modifier.height(8.dp))
     when {
         state.isLoading -> {
             Box(
@@ -324,80 +427,44 @@ fun CategoryContent(
                 modifier = Modifier.fillMaxWidth().height(200.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = "No items found",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        }
-        else -> {
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(state.items) { item ->
-                    CleanupItemCard(
-                        cleanupItem = item,
-                        isSelected = selectedItems.contains(item.id),
-                        onSelectionChanged = { selected -> onSelectionChanged(item.id, selected) }
-                    )
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Icon(Icons.Default.Image, contentDescription = null, modifier = Modifier.size(48.dp), tint = Color.LightGray)
+                    Spacer(Modifier.height(8.dp))
+                    Text("No items found", style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun CleanupItemCard(
-    cleanupItem: CleanupItem,
-    isSelected: Boolean,
-    onSelectionChanged: (Boolean) -> Unit
-) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = if (isSelected)
-                MaterialTheme.colorScheme.primaryContainer
-            else
-                MaterialTheme.colorScheme.surface
-        )
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Checkbox(
-                checked = isSelected,
-                onCheckedChange = onSelectionChanged
-            )
-
-            Spacer(modifier = Modifier.width(16.dp))
-
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = cleanupItem.displayName,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = "${cleanupItem.itemCount} items • ${cleanupItem.sizeInMB}",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+        else -> {
+            Box(modifier = Modifier.fillMaxWidth()) {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(state.items) { item ->
+                        val media = item.mediaItems.first()
+                        val extraInfo = if (item.cleanupType is CleanupType.Duplicates) "${item.itemCount} duplicates" else null
+                        MediaCleanupCard(
+                            mediaItem = media,
+                            isSelected = selectedItems.contains(item.id),
+                            onCheckedChange = { selected -> onSelectionChanged(item.id, selected) },
+                            extraInfo = extraInfo
+                        )
+                    }
+                }
+                if (state.isDeleting) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.Black.copy(alpha = 0.2f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            CircularProgressIndicator()
+                            Spacer(Modifier.height(8.dp))
+                            Text("Deleting...", color = Color.White)
+                        }
+                    }
+                }
             }
-
-            Icon(
-                when (cleanupItem.cleanupType) {
-                    is CleanupType.Duplicates -> Icons.Default.PhotoLibrary
-                    is CleanupType.LargeVideos -> Icons.Default.VideoLibrary
-                    is CleanupType.OldMedia -> Icons.Default.Schedule
-                },
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary
-            )
         }
     }
 }
