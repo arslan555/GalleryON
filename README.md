@@ -64,6 +64,7 @@ Maintains strict separation of concerns between layers.
 | `data/`                 | Repository implementations, media management.           |
 | `feature/albums/`       | Albums screen, view models, UI components.               |
 | `feature/media/`        | Media listing screen, view models, UI components.        |
+| `feature/smart-cleaner/`| Identify large files, duplicates, and low-quality media for cleanup.        |
 
 
 ## 🚀 Libraries & Tech Stack
@@ -108,13 +109,13 @@ All tests utilize `MockK`, `Turbine`, and `Compose Test APIs`.
 
 | Priority | Feature                     | Module              | Description                                                                 | Status  | Target Milestone |
 |----------|-----------------------------|---------------------|-----------------------------------------------------------------------------|---------|------------------|
-| ⭐ High   | Smart Cleaner               | `feature-cleaner`   | Identify large files, duplicates, and low-quality media for cleanup.        | 🔜 Todo | v2.0.0           |
+| ⭐ High   | Smart Cleaner               | `feature-cleaner`   | Identify large files, duplicates, and low-quality media for cleanup.        | ✅ Done | v2.0.0           |
 | ⭐ High   | Album Management            | `feature-albums`    | Create, rename, and delete custom albums.                                   | 🔜 Todo | v2.0.0           |
 | ⭐ High   | Search Functionality        | `feature-search`    | Global search by name, date, tags, or file type.                            | 🔜 Todo | v2.1.0           |
 | ⭐ High   | Tagging System              | `feature-tagging`   | Let users assign tags and filter media accordingly.                         | 🔜 Todo | v2.1.0           |
 | ⭐ High   | Vault Mode (Private Albums) | `feature-vault`     | Add biometric-secured private albums.                                       | 🔜 Todo | v2.2.0           |
 | ⭐ High   | Cloud Backup Integration    | `feature-cloud`     | Optional Google Drive/Dropbox backup for media.                             | 🧪 Idea | v2.3.0           |
-| ⭐ Medium| Sort & Filter Controls      | `feature-media`     | Filter media by size, type, date; sort by date, name, or size.              | ✅ Done | v1.2.0           |
+| ⭐ Medium| Sort & Filter Controls      | `feature-media`     | Filter media by size, type, date; sort by date, name, or size.               | 🔜 Todo | v2.3.0           |
 | ⭐ Medium| AI Categorization            | `feature-ai`        | Use ML Kit to categorize photos (e.g., people, travel, food).               | 🧪 Idea | v2.4.0           |
 | ⭐ Medium| Media Editor Options         | `feature-edit`      | Crop, rotate, compress, or trim media within app.                           | 🧪 Idea | v2.5.0           |
 | ⭐ Medium| Crash Reporting              | `core-analytics`    | Firebase Crashlytics integration for error monitoring.                      | 🔜 Todo | v2.0.0           |
