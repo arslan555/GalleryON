@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -383,25 +384,33 @@ fun CategoryContent(
     ) {
         OutlinedButton(
             onClick = onSelectAll,
-            enabled = state.items.isNotEmpty() && state.error == null && !state.isDeleting
+            enabled = state.items.isNotEmpty() && state.error == null && !state.isDeleting,
+            colors = ButtonDefaults.outlinedButtonColors(),
+            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp),
+            modifier = Modifier.height(ButtonDefaults.MinHeight)
         ) {
-            Text("Select All")
+            Text("Select All", style = MaterialTheme.typography.labelSmall)
         }
         OutlinedButton(
             onClick = onClearAll,
-            enabled = selectedItems.isNotEmpty() && state.error == null && !state.isDeleting
+            enabled = selectedItems.isNotEmpty() && state.error == null && !state.isDeleting,
+            colors = ButtonDefaults.outlinedButtonColors(),
+            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp),
+            modifier = Modifier.height(ButtonDefaults.MinHeight)
         ) {
-            Text("Clear All")
+            Text("Clear All", style = MaterialTheme.typography.labelSmall)
         }
         Button(
             onClick = onDeleteSelected,
             enabled = selectedItems.isNotEmpty() && state.error == null && !state.isDeleting,
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp),
+            modifier = Modifier.height(ButtonDefaults.MinHeight)
         ) {
             if (state.isDeleting) {
                 CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
             } else {
-                Text("Delete")
+                Text("Delete", style = MaterialTheme.typography.labelSmall)
             }
         }
     }
