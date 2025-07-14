@@ -1,13 +1,14 @@
 package com.arslan.data.media
 
-
 import android.content.Context
 import android.database.Cursor
 import android.provider.MediaStore
 import com.arslan.domain.model.media.MediaItem
 import com.arslan.domain.model.media.MediaType
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -19,8 +20,9 @@ class MediaManager @Inject constructor(
     private val _allMediaItems = MutableStateFlow<List<MediaItem>>(emptyList())
     val allMediaItems = _allMediaItems.asStateFlow()
 
-     fun loadAllMedia() {
-        if (_allMediaItems.value.isNotEmpty()) return // Already loaded
+    suspend fun loadAllMedia() = withContext(Dispatchers.IO) {
+        // Always reload to ensure we have the latest data
+        android.util.Log.d("MediaManager", "Loading all media from OS...")
 
         val mediaItems = mutableListOf<MediaItem>()
 
@@ -92,6 +94,79 @@ class MediaManager @Inject constructor(
         }
 
         _allMediaItems.value = mediaItems
+    }
+
+    /**
+     * Get all images from the loaded media
+     */
+    fun getImages(): List<MediaItem> {
+        return allMediaItems.value.filter { it.mediaType == MediaType.Image }
+    }
+
+    /**
+     * Get all videos from the loaded media
+     */
+    private fun getVideos(): List<MediaItem> {
+        return allMediaItems.value.filter { it.mediaType == MediaType.Video }
+    }
+
+    /**
+     * Get media items older than specified timestamp
+     */
+    fun getOldMedia(cutoffTime: Long): List<MediaItem> {
+        return allMediaItems.value.filter { (it.dateTaken ?: 0) < cutoffTime }
+    }
+
+    /**
+     * Get large videos above specified size threshold
+     */
+    fun getLargeVideos(thresholdBytes: Long): List<MediaItem> {
+        return getVideos().filter { (it.size ?: 0) > thresholdBytes }
+    }
+
+    /**
+     * Clear cached media items (useful after deletions)
+     */
+    fun clearCache() {
+        _allMediaItems.value = emptyList()
+    }
+
+    /**
+     * Remove specific media items from cache (for immediate UI update after deletion)
+     */
+    fun removeFromCache(mediaIds: List<Long>) {
+        val currentItems = _allMediaItems.value.toMutableList()
+        currentItems.removeAll { it.id in mediaIds }
+        _allMediaItems.value = currentItems
+        android.util.Log.d("MediaManager", "Removed ${mediaIds.size} items from cache. Remaining: ${_allMediaItems.value.size}")
+    }
+
+    /**
+     * Force reload all media from OS (for background sync)
+     */
+    private suspend fun forceReload() = withContext(Dispatchers.IO) {
+        _allMediaItems.value = emptyList() // Clear first
+        loadAllMedia() // Reload from OS
+    }
+
+    /**
+     * Smart refresh: immediate cache update + background OS sync
+     */
+    suspend fun smartRefresh(deletedMediaIds: List<Long>) = withContext(Dispatchers.IO) {
+        android.util.Log.d("MediaManager", "Starting smart refresh for ${deletedMediaIds.size} items")
+        
+        // Step 1: Immediate cache update for fast UI response
+        removeFromCache(deletedMediaIds)
+        
+        // Step 2: Force reload to ensure cache is updated with latest data
+        // This is important for duplicate detection to work correctly
+        try {
+            forceReload()
+            android.util.Log.d("MediaManager", "Smart refresh completed successfully")
+        } catch (e: Exception) {
+            android.util.Log.e("MediaManager", "Smart refresh failed: ${e.message}", e)
+            throw e
+        }
     }
 
     private fun Cursor.getLongOrNull(columnIndex: Int): Long? {

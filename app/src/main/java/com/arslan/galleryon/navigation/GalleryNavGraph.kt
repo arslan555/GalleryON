@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import com.arslan.core.navigation.NavigationRoutes
 import com.arslan.feature.albums.navigation.albumsNavigation
 import com.arslan.feature.media.navigation.mediaNavigation
+import com.arslan.feature.smartcleaner.navigation.smartCleanerNavigation
 
 
 @Composable
@@ -19,5 +20,6 @@ fun GalleryNavGraph(
     ) {
         albumsNavigation(navController)
         mediaNavigation(navController)
+        smartCleanerNavigation(navController)
     }
 }

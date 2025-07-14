@@ -12,16 +12,26 @@ class GetAlbumsUseCase @Inject constructor(
     fun execute(): Flow<List<AlbumItem>> {
         return mediaRepository.getAllMediaItems()
             .map { mediaItems ->
-                mediaItems
+                val groupedAlbums = mediaItems
                     .groupBy { it.folderName ?: "Unknown" }
                     .map { (folderName, items) ->
+                        val cleanFolderName = folderName.trimEnd('/')
+                        val albumName = cleanFolderName.substringAfterLast("/").ifBlank { "Unknown" }
                         AlbumItem(
                             id = folderName,
-                            name = folderName.substringAfterLast("/").removeSuffix("/"),
+                            name = albumName,
                             mediaItems = items.sortedByDescending { it.dateTaken }
                         )
                     }
                     .sortedByDescending { it.mediaItems.maxOfOrNull { it.dateTaken ?: 0L } }
+
+                val allPhotosAlbum = AlbumItem(
+                    id = "ALL_PHOTOS",
+                    name = "All Photos",
+                    mediaItems = mediaItems.sortedByDescending { it.dateTaken }
+                )
+
+                listOf(allPhotosAlbum) + groupedAlbums
             }
     }
 }

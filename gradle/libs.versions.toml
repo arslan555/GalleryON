@@ -7,6 +7,7 @@ compose-bom = "2024.03.00"
 material3 = "1.1.2"
 lifecycle = "2.7.0"
 coroutines = "1.7.3"
+materialIconsExtended = "1.7.8"
 navigation = "2.7.6"
 accompanist = "0.34.0"
 hilt = "2.48"
@@ -47,6 +48,7 @@ androidx-core = { module = "androidx.test:core", version.ref = "core" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version = "1.12.0" }
 
 # Lifecycle
+androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
 androidx-runner = { module = "androidx.test:runner", version.ref = "runner" }
 lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycle" }
 lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycle" }
@@ -66,7 +68,6 @@ compose-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4", 
 compose-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest", version.ref = "compose" }
 
 # Lifecycle
-lifecycle-viewmodel = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "lifecycle" }
 lifecycle-runtime = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycle" }
 
 # Navigation

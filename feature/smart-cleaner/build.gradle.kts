@@ -1,22 +1,18 @@
 plugins {
-    alias(libs.plugins.android.application)
+    alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
 }
 
 android {
-    namespace = "com.arslan.galleryon"
+    namespace = "com.arslan.feature.smartcleaner"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.arslan.galleryon"
         minSdk = 24
-        //noinspection OldTargetApi
-        targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles("consumer-rules.pro")
     }
 
     buildTypes {
@@ -26,7 +22,6 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("debug")
         }
     }
 
@@ -49,13 +44,13 @@ android {
 }
 
 dependencies {
+    implementation(project(":core"))
+    implementation(project(":domain"))
+    implementation(project(":data"))
+
     // DI
     implementation(libs.hilt.android)
-    implementation(project(":feature:albums"))
-    implementation(project(":feature:media"))
-    implementation(project(":feature:smart-cleaner"))
-    implementation(project(":data"))
-    implementation(project(":core"))
+    implementation(libs.hilt.navigation.compose)
     ksp(libs.hilt.compiler)
 
     // Use BOM
@@ -64,10 +59,12 @@ dependencies {
     // Compose dependencies
     implementation(libs.compose.ui)
     implementation(libs.compose.material3)
+    implementation(libs.androidx.material3.android)
     implementation(libs.compose.runtime)
     implementation(libs.compose.ui.tooling)
     implementation(libs.compose.ui.preview)
     implementation(libs.compose.navigation)
+    implementation(libs.androidx.material.icons.extended)
 
     // Lifecycle & ViewModel
     implementation(libs.lifecycle.viewmodel.compose)
@@ -76,16 +73,18 @@ dependencies {
     // Coroutines
     implementation(libs.coroutines.android)
 
-    // Media, Permissions & Data
-    implementation(libs.media3.common)
-    implementation(libs.accompanist.permissions)
+    //coil
+    implementation(libs.coil.kt)
+    implementation(libs.coil.kt.compose)
 
     // Unit Testing
     testImplementation(libs.junit)
     testImplementation(libs.coroutines.test)
     testImplementation(libs.mockk)
     testImplementation(libs.hilt.testing)
+    testImplementation(libs.turbine)
+
     // UI Testing
     androidTestImplementation(libs.compose.test.junit4)
     debugImplementation(libs.compose.test.manifest)
-}
+} 
