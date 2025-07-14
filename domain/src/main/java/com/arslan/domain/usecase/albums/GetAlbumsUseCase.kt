@@ -15,9 +15,11 @@ class GetAlbumsUseCase @Inject constructor(
                 mediaItems
                     .groupBy { it.folderName ?: "Unknown" }
                     .map { (folderName, items) ->
+                        val cleanFolderName = folderName.trimEnd('/')
+                        val albumName = cleanFolderName.substringAfterLast("/").ifBlank { "Unknown" }
                         AlbumItem(
                             id = folderName,
-                            name = folderName.substringAfterLast("/").removeSuffix("/"),
+                            name = albumName,
                             mediaItems = items.sortedByDescending { it.dateTaken }
                         )
                     }
