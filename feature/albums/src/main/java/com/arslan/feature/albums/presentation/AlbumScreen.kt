@@ -10,6 +10,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.ViewModule
 import androidx.compose.material.icons.filled.CleaningServices
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -31,6 +34,9 @@ fun AlbumsScreen(
 ) {
     var isGrid by rememberSaveable { mutableStateOf(true) }
     var hasPermission by remember { mutableStateOf(false) }
+    var showCreateDialog by remember { mutableStateOf(false) }
+    var albumName by remember { mutableStateOf("") }
+    
     val state by viewModel.state.collectAsState()
 
     Scaffold(
@@ -52,6 +58,16 @@ fun AlbumsScreen(
                     }
                 }
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { 
+                    albumName = ""
+                    showCreateDialog = true 
+                }
+            ) {
+                Icon(Icons.Default.Add, contentDescription = "Create Album")
+            }
         }
     ) { innerPadding ->
 
@@ -83,6 +99,20 @@ fun AlbumsScreen(
                             text = currentState.message,
                             modifier = Modifier.align(Alignment.Center)
                         )
+                    }
+
+                    is AlbumsState.OperationLoading -> {
+                        Column(
+                            modifier = Modifier.align(Alignment.Center),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            CircularProgressIndicator()
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(
+                                text = currentState.operation,
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                        }
                     }
 
                     is AlbumsState.Success -> {
@@ -121,8 +151,93 @@ fun AlbumsScreen(
                     is AlbumsState.AlbumSelected -> {
                         // Optionally handle selected album
                     }
+
+                    is AlbumsState.OperationSuccess -> {
+                        // Show success state briefly, then load albums
+                        LaunchedEffect(currentState) {
+                            kotlinx.coroutines.delay(1500)
+                            viewModel.onEvent(AlbumsEvent.Refresh)
+                        }
+                        Column(
+                            modifier = Modifier.align(Alignment.Center),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.CheckCircle,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(48.dp)
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(
+                                text = currentState.message,
+                                style = MaterialTheme.typography.bodyLarge,
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                            )
+                        }
+                    }
+
+                    is AlbumsState.OperationError -> {
+                        // Show error state briefly, then load albums
+                        LaunchedEffect(currentState) {
+                            kotlinx.coroutines.delay(2000)
+                            viewModel.onEvent(AlbumsEvent.Refresh)
+                        }
+                        Column(
+                            modifier = Modifier.align(Alignment.Center),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Error,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.size(48.dp)
+                            )
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(
+                                text = currentState.message,
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.error,
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                            )
+                        }
+                    }
                 }
             }
         }
+    }
+
+    // Create Album Dialog
+    if (showCreateDialog) {
+        AlertDialog(
+            onDismissRequest = { showCreateDialog = false },
+            title = { Text("Create New Album") },
+            text = {
+                OutlinedTextField(
+                    value = albumName,
+                    onValueChange = { albumName = it },
+                    label = { Text("Album Name") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        if (albumName.isNotBlank()) {
+                            viewModel.onEvent(AlbumsEvent.CreateAlbum(albumName))
+                            showCreateDialog = false
+                        }
+                    }
+                ) {
+                    Text("Create")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showCreateDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
     }
 }

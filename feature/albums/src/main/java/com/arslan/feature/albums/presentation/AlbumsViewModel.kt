@@ -3,6 +3,7 @@ package com.arslan.feature.albums.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.arslan.domain.usecase.albums.GetAlbumsUseCase
+import com.arslan.domain.usecase.albums.CreateAlbumUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,7 +16,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AlbumsViewModel @Inject constructor(
-    private val getAlbumsUseCase: GetAlbumsUseCase
+    private val getAlbumsUseCase: GetAlbumsUseCase,
+    private val createAlbumUseCase: CreateAlbumUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<AlbumsState>(AlbumsState.Loading)
@@ -40,9 +42,20 @@ class AlbumsViewModel @Inject constructor(
             AlbumsEvent.Refresh -> {
                 loadAlbums()
             }
-
             is AlbumsEvent.AlbumClicked -> {
                 _state.value = AlbumsState.AlbumSelected(event.albumId)
+            }
+            is AlbumsEvent.CreateAlbum -> {
+                viewModelScope.launch {
+                    _state.value = AlbumsState.OperationLoading("Creating album...")
+                    val success = createAlbumUseCase(event.name)
+                    if (success) {
+                        _state.value = AlbumsState.OperationSuccess("Album '${event.name}' created successfully!")
+                        loadAlbums()
+                    } else {
+                        _state.value = AlbumsState.OperationError("Failed to create album '${event.name}'")
+                    }
+                }
             }
         }
     }

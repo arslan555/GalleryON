@@ -15,4 +15,6 @@ class MediaRepositoryImpl @Inject constructor(
         mediaManager.loadAllMedia()
         emit(mediaManager.allMediaItems.value)
     }
+
+    override suspend fun createAlbum(folderName: String): Boolean = mediaManager.createAlbum(folderName)
 }
