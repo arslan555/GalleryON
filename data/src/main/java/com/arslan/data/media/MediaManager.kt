@@ -1,8 +1,10 @@
 package com.arslan.data.media
 
+import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
 import android.provider.MediaStore
+import android.util.Log
 import com.arslan.domain.model.media.MediaItem
 import com.arslan.domain.model.media.MediaType
 import kotlinx.coroutines.Dispatchers
@@ -22,7 +24,7 @@ class MediaManager @Inject constructor(
 
     suspend fun loadAllMedia() = withContext(Dispatchers.IO) {
         // Always reload to ensure we have the latest data
-        android.util.Log.d("MediaManager", "Loading all media from OS...")
+        Log.d("MediaManager", "Loading all media from OS...")
 
         val mediaItems = mutableListOf<MediaItem>()
 
@@ -138,7 +140,7 @@ class MediaManager @Inject constructor(
         val currentItems = _allMediaItems.value.toMutableList()
         currentItems.removeAll { it.id in mediaIds }
         _allMediaItems.value = currentItems
-        android.util.Log.d("MediaManager", "Removed ${mediaIds.size} items from cache. Remaining: ${_allMediaItems.value.size}")
+        Log.d("MediaManager", "Removed ${mediaIds.size} items from cache. Remaining: ${_allMediaItems.value.size}")
     }
 
     /**
@@ -153,7 +155,7 @@ class MediaManager @Inject constructor(
      * Smart refresh: immediate cache update + background OS sync
      */
     suspend fun smartRefresh(deletedMediaIds: List<Long>) = withContext(Dispatchers.IO) {
-        android.util.Log.d("MediaManager", "Starting smart refresh for ${deletedMediaIds.size} items")
+        Log.d("MediaManager", "Starting smart refresh for ${deletedMediaIds.size} items")
         
         // Step 1: Immediate cache update for fast UI response
         removeFromCache(deletedMediaIds)
@@ -162,13 +164,69 @@ class MediaManager @Inject constructor(
         // This is important for duplicate detection to work correctly
         try {
             forceReload()
-            android.util.Log.d("MediaManager", "Smart refresh completed successfully")
+            Log.d("MediaManager", "Smart refresh completed successfully")
         } catch (e: Exception) {
-            android.util.Log.e("MediaManager", "Smart refresh failed: ${e.message}", e)
+            Log.e("MediaManager", "Smart refresh failed: ${e.message}", e)
             throw e
         }
     }
 
+    suspend fun createAlbum(folderName: String): Boolean = withContext(Dispatchers.IO) {
+        return@withContext try {
+            // Create a placeholder image using MediaStore to ensure it appears in galleries
+            val contentValues = ContentValues().apply {
+                put(MediaStore.Images.Media.DISPLAY_NAME, "album_placeholder.png")
+                put(MediaStore.Images.Media.MIME_TYPE, "image/png")
+                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/$folderName/")
+                put(MediaStore.Images.Media.IS_PENDING, 1)
+            }
+
+            val resolver = context.contentResolver
+            val uri = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+
+            if (uri != null) {
+                // Write a minimal 1x1 transparent PNG file
+                resolver.openOutputStream(uri)?.use { outputStream ->
+                    // This is a minimal valid PNG file (1x1 transparent pixel)
+                    val pngBytes = byteArrayOf(
+                        0x89.toByte(), 0x50.toByte(), 0x4E.toByte(), 0x47.toByte(), // PNG signature
+                        0x0D.toByte(), 0x0A.toByte(), 0x1A.toByte(), 0x0A.toByte(),
+                        0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x0D.toByte(), // IHDR chunk length
+                        0x49.toByte(), 0x48.toByte(), 0x44.toByte(), 0x52.toByte(), // IHDR
+                        0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x01.toByte(), // width: 1
+                        0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x01.toByte(), // height: 1
+                        0x08.toByte(), 0x06.toByte(), 0x00.toByte(), 0x00.toByte(), // bit depth, color type, etc.
+                        0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte(), // compression, filter, interlace
+                        0x37.toByte(), 0x6E.toByte(), 0xF9.toByte(), 0x24.toByte(), // CRC
+                        0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x0C.toByte(), // IDAT chunk length
+                        0x49.toByte(), 0x44.toByte(), 0x41.toByte(), 0x54.toByte(), // IDAT
+                        0x78.toByte(), 0x9C.toByte(), 0x62.toByte(), 0x60.toByte(), // compressed data
+                        0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x02.toByte(), // more compressed data
+                        0x00.toByte(), 0x01.toByte(), 0x00.toByte(), 0x00.toByte(), // end of compressed data
+                        0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte(), // CRC
+                        0x00.toByte(), 0x00.toByte(), 0x00.toByte(), 0x00.toByte(), // IEND chunk length
+                        0x49.toByte(), 0x45.toByte(), 0x4E.toByte(), 0x44.toByte(), // IEND
+                        0xAE.toByte(), 0x42.toByte(), 0x60.toByte(), 0x82.toByte()  // CRC
+                    )
+                    outputStream.write(pngBytes)
+                }
+
+                // Commit the file by setting IS_PENDING to 0
+                contentValues.clear()
+                contentValues.put(MediaStore.Images.Media.IS_PENDING, 0)
+                resolver.update(uri, contentValues, null, null)
+                
+                Log.d("MediaManager", "Created album with placeholder image: $folderName $uri")
+                true
+            } else {
+                Log.e("MediaManager", "Failed to create album: $folderName")
+                false
+            }
+        } catch (e: Exception) {
+            Log.e("MediaManager", "Error creating album: ${e.message}", e)
+            false
+        }
+    }
     private fun Cursor.getLongOrNull(columnIndex: Int): Long? {
         return if (isNull(columnIndex)) null else getLong(columnIndex)
     }
