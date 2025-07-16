@@ -43,9 +43,9 @@ GalleryOn is a native Android application built in **Kotlin**, designed to showc
 
 ### 🌙 Dark Mode
 
-| Launcher Screen | Album Screen (Grid) | Album Screen (List) | Media List Screen | Media Detail Screen |
-|:---------------:|:-----------------------------------------------------------------------:|:-----------------------------------------------------------------------:|:-----------------------------------------------------------------:|:------------------------------------------------------------------------:|
-| <img src="screenshots/night/launcher.png" width="400" height="300"/> | <img src="screenshots/night/albums-grid.png" width="400" height="300"/> | <img src="screenshots/night/albums-list.png" width="400" height="300"/> | <img src="screenshots/night/media.png" width="400" height="300"/> | <img src="screenshots/night/media-detail.png" width="400" height="300"/> |
+| Launcher Screen | Album Screen (Grid) | Album Screen (List) | Media List Screen | Media Detail Screen | Cleanup Duplicate Screen |
+|:---------------:|:-----------------------------------------------------------------------:|:-----------------------------------------------------------------------:|:-----------------------------------------------------------------:|:------------------------------------------------------------------------:|:----------------------------------------------------------------------:|
+| <img src="screenshots/night/launcher.png" width="400" height="300"/> | <img src="screenshots/night/albums-grid.png" width="400" height="300"/> | <img src="screenshots/night/albums-list.png" width="400" height="300"/> | <img src="screenshots/night/media.png" width="400" height="300"/> | <img src="screenshots/night/media-detail.png" width="400" height="300"/> |<img src="screenshots/night/duplicate-cleanup.png" width="400" height="300"/> |
 
 
 
