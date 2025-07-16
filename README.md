@@ -110,7 +110,7 @@ All tests utilize `MockK`, `Turbine`, and `Compose Test APIs`.
 | Priority | Feature                     | Module              | Description                                                                 | Status  | Target Milestone |
 |----------|-----------------------------|---------------------|-----------------------------------------------------------------------------|---------|------------------|
 | ⭐ High   | Smart Cleaner               | `feature-cleaner`   | Identify large files, duplicates, and low-quality media for cleanup.        | ✅ Done | v2.0.0           |
-| ⭐ High   | Album Management            | `feature-albums`    | Create, rename, and delete custom albums.                                   | 🔜 Todo | v2.0.0           |
+| ⭐ High   | Album Management            | `feature-albums`    | Create albums.                                                              | ✅ Done | v2.0.0           |
 | ⭐ High   | Search Functionality        | `feature-search`    | Global search by name, date, tags, or file type.                            | 🔜 Todo | v2.1.0           |
 | ⭐ High   | Tagging System              | `feature-tagging`   | Let users assign tags and filter media accordingly.                         | 🔜 Todo | v2.1.0           |
 | ⭐ High   | Vault Mode (Private Albums) | `feature-vault`     | Add biometric-secured private albums.                                       | 🔜 Todo | v2.2.0           |
