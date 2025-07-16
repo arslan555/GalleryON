@@ -35,18 +35,17 @@ GalleryOn is a native Android application built in **Kotlin**, designed to showc
 
 ### ☀️ Light Mode
 
-| Launcher Screen | Album Screen (Grid) | Album Screen (List) | Media List Screen | Media Detail Screen | Cleanup Duplicate Screen | Cleanup Large-Media Screen |
-|:---------------:|:---------------------------------------------------------------------:|:---------------------------------------------------------------------:|:---------------------------------------------------------------:|:----------------------------------------------------------------------:|:----------------------------------------------------------------------:|:----------------------------------------------------------------------:|
-| <img src="screenshots/day/launcher.png" width="400" height="300"/> | <img src="screenshots/day/albums-grid.png" width="400" height="300"/> | <img src="screenshots/day/albums-list.png" width="400" height="300"/> | <img src="screenshots/day/media.png" width="400" height="300"/> | <img src="screenshots/day/media-detail.png" width="400" height="300"/> | <img src="screenshots/day/duplicate-cleanup.png" width="400" height="300"/> |<img src="screenshots/day/largemedia-cleanup.png" width="400" height="300"/> |
+| Album Screen (Grid) | Album Screen (List) | Media List Screen | Media Detail Screen | Cleanup Duplicate Screen | Cleanup Large-Media Screen | Cleanup Old-Media Screen |
+|:---------------------------------------------------------------------:|:---------------------------------------------------------------------:|:---------------------------------------------------------------:|:----------------------------------------------------------------------:|:----------------------------------------------------------------------:|:----------------------------------------------------------------------:|:----------------------------------------------------------------------:|
+| <img src="screenshots/day/albums-grid.png" width="400" height="300"/> | <img src="screenshots/day/albums-list.png" width="400" height="300"/> | <img src="screenshots/day/media.png" width="400" height="300"/> | <img src="screenshots/day/media-detail.png" width="400" height="300"/> | <img src="screenshots/day/duplicate-cleanup.png" width="400" height="300"/> | <img src="screenshots/day/largemedia-cleanup.png" width="400" height="300"/> | <img src="screenshots/day/oldmedia-cleanup.png" width="400" height="300"/> |
 
 
 
 ### 🌙 Dark Mode
 
-| Launcher Screen | Album Screen (Grid) | Album Screen (List) | Media List Screen | Media Detail Screen | Cleanup Duplicate Screen |Cleanup Large-Media Screen |
-|:---------------:|:-----------------------------------------------------------------------:|:-----------------------------------------------------------------------:|:-----------------------------------------------------------------:|:------------------------------------------------------------------------:|:----------------------------------------------------------------------:|:----------------------------------------------------------------------:|
-| <img src="screenshots/night/launcher.png" width="400" height="300"/> | <img src="screenshots/night/albums-grid.png" width="400" height="300"/> | <img src="screenshots/night/albums-list.png" width="400" height="300"/> | <img src="screenshots/night/media.png" width="400" height="300"/> | <img src="screenshots/night/media-detail.png" width="400" height="300"/> |<img src="screenshots/night/duplicate-cleanup.png" width="400" height="300"/> |<img src="screenshots/night/largemedia-cleanup.png" width="400" height="300"/> |
-
+| Album Screen (Grid) | Album Screen (List) | Media List Screen | Media Detail Screen | Cleanup Duplicate Screen | Cleanup Large-Media Screen | Cleanup Old-Media Screen |
+|:-----------------------------------------------------------------------:|:-----------------------------------------------------------------------:|:-----------------------------------------------------------------:|:------------------------------------------------------------------------:|:----------------------------------------------------------------------:|:----------------------------------------------------------------------:|:----------------------------------------------------------------------:|
+| <img src="screenshots/night/albums-grid.png" width="400" height="300"/> | <img src="screenshots/night/albums-list.png" width="400" height="300"/> | <img src="screenshots/night/media.png" width="400" height="300"/> | <img src="screenshots/night/media-detail.png" width="400" height="300"/> | <img src="screenshots/night/duplicate-cleanup.png" width="400" height="300"/> | <img src="screenshots/night/largemedia-cleanup.png" width="400" height="300"/> | <img src="screenshots/night/old-media-cleanup.png" width="400" height="300"/> |
 
 
 ## 🧠 Architecture
